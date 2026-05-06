@@ -18,3 +18,43 @@ body {
   font-family: Arial, Helvetica, sans-serif;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
+
+/* Formato de gota de água para a navbar */
+.navbar-gota {
+  position: relative;
+  border-radius: 0 0 24px 24px;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+}
+
+.dark .navbar-gota {
+  background: rgba(17, 24, 39, 0.95);
+}
+
+/* A "gota" - curva superior tipo pingo */
+.navbar-gota::before {
+  content: '';
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 12px;
+  background: inherit;
+  border-radius: 50% 50% 0 0;
+  filter: blur(2px);
+}
+
+/* Brilho da gota */
+.navbar-gota::after {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 8px;
+  background: radial-gradient(ellipse, rgba(59,130,246,0.5), transparent);
+  border-radius: 50%;
+  filter: blur(4px);
+}
