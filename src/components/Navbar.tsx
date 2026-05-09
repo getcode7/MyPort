@@ -48,7 +48,7 @@ export function Navbar() {
       <nav className="fixed top-0 left-0 w-full z-50 pointer-events-none">
         <div className="relative w-full h-[120px]">
           
-          {/* 🔥 SVG com Efeitos 3D Refinados */}
+          {/*  SVG com Efeitos 3D Refinados */}
           <svg
             viewBox="0 0 1000 120"
             className="absolute top-0 left-0 w-full h-full"
