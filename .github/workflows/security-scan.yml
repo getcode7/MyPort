@@ -1,0 +1,47 @@
+name: Security Scan
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '0 0 * * 0'  # Semanalmente aos domingos
+
+jobs:
+  security-scan:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Run npm audit
+      run: npm audit --audit-level=high
+    
+    - name: Run security check script
+      run: node scripts/security-check.js
+    
+    - name: Check for vulnerabilities in dependencies
+      run: |
+        npm audit --json > audit-report.json
+        if grep -q "high" audit-report.json; then
+          echo "⚠️ High severity vulnerabilities found!"
+          exit 1
+        fi
+    
+    - name: Upload security report
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: security-report
+        path: |
+          audit-report.json
+          security-report.json

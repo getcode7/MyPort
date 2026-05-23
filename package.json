@@ -4,18 +4,23 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build --no-lint",
     "start": "next start",
     "lint": "next lint",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "security-check": "node scripts/security-check.js",
+    "audit-deps": "node scripts/audit-dependencies.js",
+    "security-fix": "npm audit fix",
+    "security-report": "npm audit --json > security-report.json"
   },
   "dependencies": {
+    "@base-ui/react": "^1.5.0",
     "@radix-ui/react-slot": "^1.2.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "framer-motion": "^12.38.0",
     "lucide-react": "^0.468.0",
-    "next": "14.2.35",
+    "next": "^14.2.35",
     "react": "^18",
     "react-dom": "^18",
     "tailwind-merge": "^3.5.0"
@@ -27,7 +32,7 @@
     "autoprefixer": "^10.5.0",
     "eslint": "^8",
     "eslint-config-next": "14.2.35",
-    "postcss": "^8.5.13",
+    "postcss": "^8.5.15",
     "tailwindcss": "^3.4.19",
     "typescript": "^5"
   }

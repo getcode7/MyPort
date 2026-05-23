@@ -1,16 +1,29 @@
+/* ============================================================================
+   TAILWIND IMPORTS
+   =========================================================================== */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================================================
+   VARIÁVEIS CSS (TEMAS)
+   =========================================================================== */
+
+/* Tema claro (padrão) */
 :root {
   --background: #ffffff;
   --foreground: #171717;
 }
 
+/* Tema escuro */
 .dark {
   --background: #0a0a0a;
   --foreground: #ededed;
 }
+
+/* ============================================================================
+   ESTILOS GLOBAIS
+   =========================================================================== */
 
 body {
   color: var(--foreground);
@@ -19,19 +32,25 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Formato de gota de água para a navbar */
+/* ============================================================================
+   COMPONENTE: NAVBAR GOTA
+   Estilo de gota de água para a navbar
+   =========================================================================== */
+
+/* Container principal da navbar com efeito de gota */
 .navbar-gota {
   position: relative;
   border-radius: 0 0 24px 24px;
   background: rgba(255, 255, 255, 0.95);
-  box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
 }
 
+/* Versão dark mode */
 .dark .navbar-gota {
   background: rgba(17, 24, 39, 0.95);
 }
 
-/* A "gota" - curva superior tipo pingo */
+/* Curva superior da gota (formato de pingo) */
 .navbar-gota::before {
   content: '';
   position: absolute;
@@ -45,7 +64,7 @@ body {
   filter: blur(2px);
 }
 
-/* Brilho da gota */
+/* Efeito de brilho na gota */
 .navbar-gota::after {
   content: '';
   position: absolute;
@@ -54,7 +73,67 @@ body {
   transform: translateX(-50%);
   width: 40px;
   height: 8px;
-  background: radial-gradient(ellipse, rgba(59,130,246,0.5), transparent);
+  background: radial-gradient(ellipse, rgba(59, 130, 246, 0.5), transparent);
   border-radius: 50%;
   filter: blur(4px);
+}
+
+/* ============================================================================
+   ANIMAÇÕES PERSONALIZADAS
+   =========================================================================== */
+
+/**
+ * Animação de rotação lenta
+ * Usada para efeitos de loading ou decoração
+ */
+@keyframes spin-slow {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 8s linear infinite;
+}
+
+/* ============================================================================
+   UTILITÁRIOS PERSONALIZADOS
+   =========================================================================== */
+
+/**
+ * Delay para animações
+ * Útil para criar efeitos sequenciais
+ */
+.delay-1000 {
+  animation-delay: 1s;
+}
+
+/* ============================================================================
+   MEDIA QUERIES (Opcional - para futuras melhorias)
+   =========================================================================== */
+
+/* Exemplo: Ajustes para mobile (se necessário no futuro)
+@media (max-width: 768px) {
+  .navbar-gota {
+    border-radius: 0 0 16px 16px;
+  }
+}
+*/
+
+/* ============================================================================
+   UTILITÁRIOS DE ACESSIBILIDADE (Opcional)
+   =========================================================================== */
+
+/* Redução de movimento para usuários que preferem menos animações */
+@media (prefers-reduced-motion: reduce) {
+  body {
+    transition: none;
+  }
+  
+  .animate-spin-slow {
+    animation: none;
+  }
 }
