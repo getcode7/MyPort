@@ -249,12 +249,34 @@ const ContentColumn = memo(function ContentColumn({
       </motion.h1>
 
       {/* Role / Cargo */}
-      <motion.p variants={itemVariants} className="text-xl md:text-2xl font-bold text-gray-600 dark:text-gray-300 mb-4">
+      <motion.p variants={itemVariants} className="
+          text-xl 
+          md:text-2xl 
+          font-bold 
+          text-gray-600 
+          dark:text-gray-300 
+          max-w-2xl 
+          mb-6 
+          leading-relaxed 
+          hyphens-auto
+          break-words            mx-auto">
         {PERSONAL_DATA.role}
       </motion.p>
 
       {/* Bio */}
-      <motion.p variants={itemVariants} className="text-base md:text-lg text-gray-500 dark:text-gray-400 max-w-2xl lg:max-w-full mb-6 leading-relaxed">
+      <motion.p variants={itemVariants} className="
+            text-base 
+            md:text-lg 
+            text-gray-500 
+            dark:text-gray-400 
+            max-w-2xl 
+            lg:max-w-full 
+            mb-6 
+            leading-relaxed 
+            text-justify 
+            hyphens-auto
+            break-words
+            mx-auto">
         {PERSONAL_DATA.bio}
       </motion.p>
 

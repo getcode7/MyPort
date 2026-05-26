@@ -1,9 +1,6 @@
 'use client';
 
-// ============================================================================
-// IMPORTS ORGANIZADOS
-// ============================================================================
-import { useState, useEffect, useCallback} from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import {
   motion,
@@ -11,163 +8,209 @@ import {
   useScroll,
   useTransform,
 } from 'framer-motion';
-import { Menu, X, Sun, Moon } from 'lucide-react';
-import { useTheme } from '@/contexts/ThemeContext';
 
-// ============================================================================
-// 1. CONSTANTES (Mantendo os valores originais)
-// ============================================================================
+import {
+  Menu,
+  X,
+  Sun,
+  Moon,
+} from 'lucide-react';
+
+import { useTheme } from '@/contexts/ThemeContext';
 
 const NAV_ITEMS = [
   { name: 'Home', href: '/' },
   { name: 'Serviços', href: '/servicos' },
   { name: 'Portfólio', href: '/portfolio' },
   { name: 'Sobre', href: '/sobre' },
-] as const;
-
-// ============================================================================
-// 2. COMPONENTE PRINCIPAL (Exatamente mesma lógica do original)
-// ============================================================================
+];
 
 export function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
+  const [windowWidth, setWindowWidth] = useState(
+    typeof window !== 'undefined' ? window.innerWidth : 1200
+  );
+
   const { theme, toggleTheme } = useTheme();
   const { scrollY } = useScroll();
 
-  // Effect para resize (mesmo do original)
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Função getCurveDepth (exatamente igual)
-  const getCurveDepth = useCallback((width: number) => {
-    if (width >= 1024) return 90;
-    if (width <= 640) return 0;
-    return ((width - 640) / (1024 - 640)) * 90;
-  }, []);
+  const metrics = useMemo(() => {
+    const width = windowWidth;
+    const t = Math.max(0, Math.min(1, (width - 480) / (1400 - 480)));
+    const p = 90 * t;
+    const px = 16 + t * 90;
+    const h = 40;
+    
+    // AJUSTE: menuY reduzido para 45px para garantir que não sai do SVG
+    const menuY = t * 33; 
+    
+    const blur = 6 + (1 - t) * 16;
+    const radius = 14 + (1 - t) * 18;
+    const thicknessOpacity = t;
 
-  const p = getCurveDepth(windowWidth);
-  
-  // Paths originais (exatamente iguais)
-  const staticPath = `M0,0 L1000,0 L1000,5 C950,5 850,${p} 500,${p} C150,${p} 50,5 0,5 Z`;
-  const thicknessPath = `M0,5 C50,5 150,${p + 3} 500,${p + 3} C850,${p + 3} 950,5 1000,5 L1000,7 C950,7 850,${p + 6} 500,${p + 6} C150,${p + 6} 50,7 0,7 Z`;
+    return { t, p, px, h, menuY, blur, radius, thicknessOpacity };
+  }, [windowWidth]);
 
-  // Opacidade baseada no scroll (mesmo do original)
-  const navOpacity = useTransform(scrollY, [0, 50], [1, 0.95]);
+  const { p, px, h, menuY, blur, radius, thicknessOpacity } = metrics;
+
+  const staticPath = `
+    M0,0
+    L1000,0
+    L1000,${h}
+    C900,${h}
+     800,${h + p}
+     500,${h + p}
+    C200,${h + p}
+     100,${h}
+     0,${h}
+    Z
+  `;
+
+  const thicknessPath = `
+    M0,${h}
+    C100,${h}
+     200,${h + p + 3}
+     500,${h + p + 3}
+    C800,${h + p + 3}
+     900,${h}
+     1000,${h}
+    L1000,${h + 2}
+    C900,${h + 2}
+     800,${h + p + 5}
+     500,${h + p + 5}
+    C200,${h + p + 5}
+     100,${h + 2}
+     0,${h + 2}
+    Z
+  `;
+
+  const navOpacity = useTransform(scrollY, [0, 50], [1, 0.98]);
 
   return (
     <>
       <nav className="fixed top-0 left-0 w-full z-50 pointer-events-none">
-        <motion.div 
+        <motion.div
           style={{ opacity: navOpacity }}
-          className="relative w-full h-[80px] sm:h-[100px] md:h-[120px]"
+          className="relative w-full px-2 sm:px-3 md:px-4"
         >
-          
-          {/* SVG ANIMADO - Exatamente igual ao original */}
-          <svg
-            viewBox="0 0 1000 120"
-            className="absolute top-0 left-0 w-full h-full"
-            preserveAspectRatio="none"
-          >
-            <defs>
-              <linearGradient id="navGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stopColor={theme === 'dark' ? '#0b0f19' : '#f5f7fb'} />
-                <stop offset="100%" stopColor={theme === 'dark' ? '#0b0f19' : '#f5f7fb'} />
-              </linearGradient>
-              <filter id="innerShadow">
-                <feOffset dx="0" dy="1" /><feGaussianBlur stdDeviation="2" result="offset-blur" />
-                <feComposite operator="out" in="SourceGraphic" in2="offset-blur" result="inverse" />
-                <feFlood floodColor="black" floodOpacity="0.08" result="color" />
-                <feComposite operator="in" in="color" in2="inverse" result="shadow" />
-                <feComposite operator="over" in="shadow" in2="SourceGraphic" />
-              </filter>
-            </defs>
-            <motion.path animate={{ d: staticPath }} transition={{ type: 'spring', stiffness: 300, damping: 30 }} fill="black" fillOpacity="0.1" className="blur-md translate-y-1.5" />
-            <motion.path animate={{ d: staticPath }} transition={{ type: 'spring', stiffness: 300, damping: 30 }} fill="url(#navGradient)" filter="url(#innerShadow)" />
-            <motion.path animate={{ d: thicknessPath, opacity: p > 10 ? 1 : 0 }} transition={{ type: 'spring', stiffness: 300, damping: 30 }} fill={theme === 'dark' ? '#161b27' : '#e2e8f0'} />
-          </svg>
-
-          {/* Fundo de Blur para Mobile - Exatamente igual */}
-          <motion.div 
-            className="absolute inset-0 md:hidden pointer-events-none"
-            style={{ 
-              backgroundColor: theme === 'dark' ? 'rgba(11, 15, 25, 0.4)' : 'rgba(245, 247, 251, 0.4)',
-              backdropFilter: `blur(${(90 - p) / 10}px)`,
-              opacity: (90 - p) / 90
+          {/* Aumentei a altura do wrapper para 160 para não cortar o conteúdo rebaixado */}
+          <div
+            className="relative mx-auto"
+            style={{
+              height: 160, 
             }}
-          />
+          >
+            {/* FUNDO (SVG) */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+              <svg
+                viewBox="0 0 1000 160"
+                className="w-full h-full"
+                preserveAspectRatio="none"
+              >
+                <defs>
+                  <linearGradient id="navGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stopColor={theme === 'dark' ? '#0b0f19' : '#f8fafc'} stopOpacity={0.95} />
+                    <stop offset="100%" stopColor={theme === 'dark' ? '#0b0f19' : '#f8fafc'} stopOpacity={0.88} />
+                  </linearGradient>
+                </defs>
+                
+                <motion.path
+                  animate={{ d: staticPath }}
+                  transition={{ type: 'spring', stiffness: 140, damping: 24 }}
+                  fill="black"
+                  fillOpacity="0.08"
+                  className="blur-md translate-y-1"
+                />
+                
+                <motion.path
+                  animate={{ d: staticPath }}
+                  transition={{ type: 'spring', stiffness: 140, damping: 24 }}
+                  fill="url(#navGradient)"
+                />
+                
+                <motion.path
+                  animate={{ d: thicknessPath, opacity: thicknessOpacity }}
+                  transition={{ type: 'spring', stiffness: 140, damping: 24 }}
+                  fill={theme === 'dark' ? '#1e2433' : '#d1d9e8'}
+                />
+              </svg>
+            </div>
 
-          {/* CONTEÚDO - Exatamente igual */}
-          <div className="relative z-10 w-full h-full flex items-start justify-center pointer-events-auto">
-            <div className={`
-              w-full max-w-7xl flex items-center justify-between
-              px-6 sm:px-12 md:px-20 lg:px-28
-              h-[50px] sm:h-[60px] md:h-[75px]
-              ${p > 45 ? 'pt-2 md:pt-4' : 'pt-0'} 
-              transition-all duration-500
-            `}>
-              
-              {/* Logo - Exatamente igual */}
-              <Link href="/" className="group shrink-0">
-                <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-b from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-[0_2px_0_rgb(30,58,138)] group-hover:translate-y-[1px] group-hover:shadow-none transition-all">
-                  <span className="text-white font-bold text-xs sm:text-sm">E</span>
+            {/* CONTEÚDO - Ajustado para ser visível */}
+            <div
+              className="relative z-20 w-full pointer-events-auto"
+              style={{ height: '100%' }} // Ocupa a altura total do wrapper
+            >
+              <motion.div
+                animate={{ paddingLeft: px, paddingRight: px }}
+                transition={{ type: 'spring', stiffness: 140, damping: 24 }}
+                className="w-full h-full flex items-start justify-between gap-2 min-w-0 pt-2" // items-start e pt-4 para alinhar o topo
+              >
+                {/* LOGO */}
+                <Link href="/" className="group shrink-0">
+                  <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-b from-blue-500 to-blue-600 flex items-center justify-center shadow-[0_2px_0_rgb(30,58,138)] transition-all group-hover:translate-y-[1px] group-hover:shadow-none">
+                    <span className="text-white font-bold text-sm">E</span>
+                  </div>
+                </Link>
+
+                {/* MENU - Desktop */}
+                <motion.div
+                  animate={{
+                    opacity: windowWidth > 768 ? 1 : 0,
+                    scale: windowWidth > 768 ? 1 : 0.96,
+                    y: menuY, // Deslocamento para baixo
+                  }}
+                  transition={{ type: 'spring', stiffness: 140, damping: 24 }}
+                  className="hidden md:flex flex-1 justify-center min-w-0"
+                >
+                  <div className="flex items-center min-w-0 overflow-hidden bg-white/40 dark:bg-gray-800/40 backdrop-blur-md px-1 py-1 rounded-2xl border border-white/40 dark:border-gray-700/40 shadow-sm">
+                    {NAV_ITEMS.map((item) => (
+                      <Link key={item.name} href={item.href}>
+                        <span className="px-2 lg:px-3 py-2 text-[11px] lg:text-[12px] font-bold uppercase tracking-wider text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 transition-colors whitespace-nowrap block">
+                          {item.name}
+                        </span>
+                      </Link>
+                    ))}
+                  </div>
+                </motion.div>
+
+                {/* AÇÕES */}
+                <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+                  <button 
+                    onClick={toggleTheme} 
+                    className="p-2 rounded-lg bg-white/40 dark:bg-gray-800/40 backdrop-blur-md hover:bg-white/60 dark:hover:bg-gray-700/60 border border-white/40 dark:border-gray-700/40 transition-all shadow-sm"
+                  >
+                    {theme === 'dark' ? <Sun size={15} className="text-yellow-500" /> : <Moon size={15} className="text-gray-700" />}
+                  </button>
+                  <button 
+                    onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} 
+                    className="md:hidden p-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100/50 dark:hover:bg-gray-800/50 rounded-lg transition-colors"
+                  >
+                    {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+                  </button>
                 </div>
-              </Link>
-
-              {/* Menu Desktop - Exatamente igual */}
-              <div className="hidden md:flex items-center bg-white/30 dark:bg-gray-800/20 backdrop-blur-sm px-1.5 py-1 rounded-xl border border-white/40 dark:border-gray-700/30 mx-4">
-                {NAV_ITEMS.map((item) => (
-                  <Link key={item.name} href={item.href}>
-                    <span className="px-3 lg:px-4 py-1.5 text-[12px] lg:text-[13px] font-bold text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer block">
-                      {item.name}
-                    </span>
-                  </Link>
-                ))}
-              </div>
-
-              {/* Ações - Exatamente igual */}
-              <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-                <button onClick={toggleTheme} className="p-1.5 rounded-md bg-gray-50/50 dark:bg-gray-800/50 hover:bg-white dark:hover:bg-gray-700 transition-all border border-gray-100 dark:border-gray-700 shadow-sm">
-                  {theme === 'dark' ? <Sun size={14} className="text-yellow-500" /> : <Moon size={14} className="text-gray-500" />}
-                </button>
-                <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="md:hidden p-1.5 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md transition-colors">
-                  {isMobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
-                </button>
-              </div>
+              </motion.div>
             </div>
           </div>
         </motion.div>
       </nav>
 
-      {/* Menu Mobile - Exatamente igual */}
+      {/* MENU MOBILE */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <>
-            <motion.div 
-              initial={{ opacity: 0 }} 
-              animate={{ opacity: 1 }} 
-              exit={{ opacity: 0 }} 
-              onClick={() => setIsMobileMenuOpen(false)} 
-              className="fixed inset-0 bg-black/20 backdrop-blur-sm z-[55] md:hidden" 
-            />
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.95, y: -20 }} 
-              animate={{ opacity: 1, scale: 1, y: 0 }} 
-              exit={{ opacity: 0, scale: 0.95, y: -20 }} 
-              className="fixed top-[60px] left-4 right-4 z-[60] md:hidden"
-            >
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsMobileMenuOpen(false)} className="fixed inset-0 bg-black/20 backdrop-blur-sm z-[55]" />
+            <motion.div initial={{ opacity: 0, scale: 0.95, y: -20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: -20 }} className="fixed top-[65px] left-4 right-4 z-[60] md:hidden">
               <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-2xl border border-gray-100 dark:border-gray-800 shadow-2xl p-4">
                 <div className="flex flex-col gap-1">
                   {NAV_ITEMS.map((item) => (
-                    <Link 
-                      key={item.name} 
-                      href={item.href} 
-                      onClick={() => setIsMobileMenuOpen(false)} 
-                      className="px-4 py-3 text-sm font-bold text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition-colors flex items-center justify-between group"
-                    >
+                    <Link key={item.name} href={item.href} onClick={() => setIsMobileMenuOpen(false)} className="px-4 py-3 text-sm font-bold text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition-colors flex items-center justify-between group">
                       {item.name}
                       <div className="w-1.5 h-1.5 rounded-full bg-blue-500 opacity-0 group-hover:opacity-100 transition-opacity" />
                     </Link>

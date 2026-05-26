@@ -348,7 +348,7 @@ export default function Home() {
                     <h3 className="text-3xl font-black mb-4 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-blue-600 group-hover:to-purple-600 transition-all">
                       {project.title}
                     </h3>
-                    <p className="text-gray-600 dark:text-gray-400 font-medium mb-8 leading-relaxed">
+                    <p className="text-gray-600 dark:text-gray-400 font-medium mb-8 leading-relaxed text-justify">
                       {project.description}
                     </p>
                     <div className="flex gap-6">
