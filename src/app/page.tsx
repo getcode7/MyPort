@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Globe, 
@@ -16,6 +17,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import { Hero } from '@/components/Hero';
+import { QuoteForm } from '@/components/QuoteForm';
 
 // ============================================
 // DADOS PERSONALIZADOS - Ecleber Monteiro
@@ -82,7 +84,6 @@ const SKILLS = [
   }
 ];
 
-// Soft Skills destacadas para recrutadores
 const SOFT_SKILLS = [
   { name: "Responsabilidade", icon: <Target className="w-5 h-5" />, description: "Compromisso com prazos e qualidade" },
   { name: "Confiabilidade", icon: <Award className="w-5 h-5" />, description: "Entrega consistente e transparente" },
@@ -90,7 +91,6 @@ const SOFT_SKILLS = [
   { name: "Performance Focus", icon: <Code2 className="w-5 h-5" />, description: "Otimização constante e boas práticas" }
 ];
 
-// Experiência e Formação
 const EXPERIENCES = [
   {
     company: "Projetos Acadêmicos & Pessoais",
@@ -116,7 +116,6 @@ const EXPERIENCES = [
   }
 ];
 
-// Estatísticas personalizadas
 const STATS = [
   { value: "4+", label: "Anos de Estudo em TI", icon: "🎓" },
   { value: "15+", label: "Projetos Desenvolvidos", icon: "💻" },
@@ -125,6 +124,8 @@ const STATS = [
 ];
 
 export default function Home() {
+  const [showForm, setShowForm] = useState(false);
+
   return (
     <main className="min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 selection:bg-blue-100 dark:selection:bg-blue-900 relative overflow-hidden">
       
@@ -137,7 +138,6 @@ export default function Home() {
           className="absolute top-0 left-0 w-[40vw] h-[40vw] bg-gradient-to-br from-blue-500/20 to-transparent rounded-full blur-[80px]"
           style={{ transformOrigin: 'top left' }}
         />
-        
         <motion.div
           initial={{ scaleX: 0, scaleY: 0, opacity: 0 }}
           animate={{ scaleX: 1, scaleY: 1, opacity: 0.5 }}
@@ -145,17 +145,13 @@ export default function Home() {
           className="absolute top-0 right-0 w-[40vw] h-[40vw] bg-gradient-to-bl from-purple-500/20 to-transparent rounded-full blur-[80px]"
           style={{ transformOrigin: 'top right' }}
         />
-
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.03),transparent_70%)]" />
       </div>
 
-      {/* Conteúdo com Z-index superior */}
       <div className="relative z-10">
-        
-        {/* HERO COMPLETO PERSONALIZADO */}
         <Hero />
 
-        {/* Seção de Estatísticas Personalizadas */}
+        {/* Estatísticas */}
         <section className="py-20">
           <div className="max-w-5xl mx-auto px-6">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
@@ -167,12 +163,8 @@ export default function Home() {
                   transition={{ delay: idx * 0.1 }}
                   className="text-center p-6 bg-white/40 dark:bg-gray-900/40 backdrop-blur-md rounded-3xl border border-gray-200/50 dark:border-gray-800/50 hover:border-blue-500/50 transition-all group"
                 >
-                  <div className="text-4xl mb-2 group-hover:scale-110 transition-transform">
-                    {stat.icon}
-                  </div>
-                  <div className="text-4xl md:text-5xl font-black bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                    {stat.value}
-                  </div>
+                  <div className="text-4xl mb-2 group-hover:scale-110 transition-transform">{stat.icon}</div>
+                  <div className="text-4xl md:text-5xl font-black bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">{stat.value}</div>
                   <div className="text-sm font-bold text-gray-500 dark:text-gray-400 mt-2">{stat.label}</div>
                 </motion.div>
               ))}
@@ -180,16 +172,13 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Seção de Soft Skills - DESTAQUE PARA RECRUTADORES */}
+        {/* Soft Skills */}
         <section className="py-20 bg-gradient-to-b from-transparent to-blue-500/5 dark:to-blue-500/5">
           <div className="max-w-5xl mx-auto px-6">
             <div className="text-center mb-16">
               <h2 className="text-4xl font-black mb-4 tracking-tight">Soft Skills em Destaque</h2>
-              <p className="text-gray-500 dark:text-gray-400 font-medium max-w-2xl mx-auto">
-                O que me diferencia e agrega valor à sua equipe
-              </p>
+              <p className="text-gray-500 dark:text-gray-400 font-medium max-w-2xl mx-auto">O que me diferencia e agrega valor à sua equipa</p>
             </div>
-
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {SOFT_SKILLS.map((skill, idx) => (
                 <motion.div
@@ -199,9 +188,7 @@ export default function Home() {
                   transition={{ delay: idx * 0.1 }}
                   className="text-center p-6 bg-gradient-to-br from-blue-50/50 to-purple-50/50 dark:from-blue-900/20 dark:to-purple-900/20 backdrop-blur-sm rounded-2xl border border-blue-200/50 dark:border-blue-800/50 hover:shadow-lg transition-all"
                 >
-                  <div className="w-14 h-14 mx-auto mb-4 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center text-white shadow-lg">
-                    {skill.icon}
-                  </div>
+                  <div className="w-14 h-14 mx-auto mb-4 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center text-white shadow-lg">{skill.icon}</div>
                   <h3 className="text-xl font-black mb-2">{skill.name}</h3>
                   <p className="text-sm text-gray-600 dark:text-gray-400">{skill.description}</p>
                 </motion.div>
@@ -210,16 +197,13 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Seção de Experiência e Formação */}
+        {/* Experiência e Formação */}
         <section className="py-20">
           <div className="max-w-5xl mx-auto px-6">
             <div className="mb-16">
               <h2 className="text-4xl font-black mb-4 tracking-tight">Trajetória & Formação</h2>
-              <p className="text-gray-500 dark:text-gray-400 font-medium">
-                Minha jornada no mundo da tecnologia
-              </p>
+              <p className="text-gray-500 dark:text-gray-400 font-medium">Minha jornada no mundo da tecnologia</p>
             </div>
-
             <div className="space-y-8">
               {EXPERIENCES.map((exp, idx) => (
                 <motion.div
@@ -236,15 +220,12 @@ export default function Home() {
                         <h3 className="text-xl font-black">{exp.role}</h3>
                         <p className="text-blue-600 dark:text-blue-400 font-bold">{exp.company}</p>
                       </div>
-                      <span className="text-sm font-bold text-gray-500 bg-white/50 dark:bg-gray-800/50 px-3 py-1 rounded-full">
-                        {exp.period}
-                      </span>
+                      <span className="text-sm font-bold text-gray-500 bg-white/50 dark:bg-gray-800/50 px-3 py-1 rounded-full">{exp.period}</span>
                     </div>
                     <ul className="space-y-2">
                       {exp.achievements.map((ach, i) => (
                         <li key={i} className="flex items-start gap-2 text-gray-600 dark:text-gray-400">
-                          <span className="text-blue-500 mt-1">▹</span>
-                          {ach}
+                          <span className="text-blue-500 mt-1">▹</span>{ach}
                         </li>
                       ))}
                     </ul>
@@ -255,19 +236,16 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Skills Section com foco em Performance */}
+        {/* Skills Técnicas */}
         <section className="py-32" id="skills">
           <div className="max-w-5xl mx-auto px-6">
             <div className="flex flex-col md:flex-row md:items-end justify-between mb-20 gap-6">
               <div>
                 <h2 className="text-4xl font-black mb-4 tracking-tight">Expertise Técnica</h2>
-                <p className="text-gray-500 dark:text-gray-400 font-medium">
-                  Tecnologias que domino com <span className="text-blue-500 font-bold">foco em performance</span>
-                </p>
+                <p className="text-gray-500 dark:text-gray-400 font-medium">Tecnologias que domino com <span className="text-blue-500 font-bold">foco em performance</span></p>
               </div>
               <div className="h-[2px] flex-1 bg-gradient-to-r from-blue-600 to-transparent hidden md:block mb-4 ml-10 opacity-30" />
             </div>
-
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {SKILLS.map((skill, index) => (
                 <motion.div
@@ -278,9 +256,7 @@ export default function Home() {
                   transition={{ delay: index * 0.1 }}
                   className="p-8 bg-white/40 dark:bg-gray-900/40 backdrop-blur-md rounded-[2rem] border border-white/50 dark:border-gray-800/50 hover:border-blue-500/50 transition-all group"
                 >
-                  <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center text-white mb-6 shadow-lg shadow-blue-500/20 group-hover:rotate-6 transition-transform">
-                    {skill.icon}
-                  </div>
+                  <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center text-white mb-6 shadow-lg shadow-blue-500/20 group-hover:rotate-6 transition-transform">{skill.icon}</div>
                   <h3 className="text-xl font-black mb-2">{skill.name}</h3>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mb-6">{skill.description}</p>
                   <ul className="space-y-2 mb-6">
@@ -291,7 +267,6 @@ export default function Home() {
                       </li>
                     ))}
                   </ul>
-                  {/* Barra de proficiência */}
                   <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
                     <div className="flex justify-between text-xs mb-1">
                       <span>Proficiência</span>
@@ -317,11 +292,8 @@ export default function Home() {
           <div className="max-w-5xl mx-auto px-6">
             <div className="mb-20">
               <h2 className="text-4xl font-black mb-4 tracking-tight">Projetos em Destaque</h2>
-              <p className="text-gray-500 dark:text-gray-400 font-medium">
-                Uma amostra do meu trabalho com <span className="text-purple-500 font-bold">foco em resultados</span>
-              </p>
+              <p className="text-gray-500 dark:text-gray-400 font-medium">Uma amostra do meu trabalho com <span className="text-purple-500 font-bold">foco em resultados</span></p>
             </div>
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
               {PROJECTS.map((project, index) => (
                 <motion.div
@@ -333,31 +305,19 @@ export default function Home() {
                   className="group relative bg-gray-100/50 dark:bg-gray-900/50 backdrop-blur-sm rounded-[3rem] overflow-hidden border border-gray-200/50 dark:border-gray-800/50 hover:shadow-2xl transition-all"
                 >
                   <div className="absolute top-4 right-4 z-10">
-                    <span className="text-xs font-black px-3 py-1 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg">
-                      {project.impact}
-                    </span>
+                    <span className="text-xs font-black px-3 py-1 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg">{project.impact}</span>
                   </div>
                   <div className="p-10">
                     <div className="flex gap-2 mb-6 flex-wrap">
                       {project.tech.map(t => (
-                        <span key={t} className="text-[10px] font-black uppercase tracking-widest text-blue-600 dark:text-blue-400 bg-blue-50/50 dark:bg-blue-900/30 px-3 py-1 rounded-full border border-blue-100/50 dark:border-blue-800/50">
-                          {t}
-                        </span>
+                        <span key={t} className="text-[10px] font-black uppercase tracking-widest text-blue-600 dark:text-blue-400 bg-blue-50/50 dark:bg-blue-900/30 px-3 py-1 rounded-full border border-blue-100/50 dark:border-blue-800/50">{t}</span>
                       ))}
                     </div>
-                    <h3 className="text-3xl font-black mb-4 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-blue-600 group-hover:to-purple-600 transition-all">
-                      {project.title}
-                    </h3>
-                    <p className="text-gray-600 dark:text-gray-400 font-medium mb-8 leading-relaxed text-justify">
-                      {project.description}
-                    </p>
+                    <h3 className="text-3xl font-black mb-4 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-blue-600 group-hover:to-purple-600 transition-all">{project.title}</h3>
+                    <p className="text-gray-600 dark:text-gray-400 font-medium mb-8 leading-relaxed text-justify">{project.description}</p>
                     <div className="flex gap-6">
-                      <a href={project.github} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm font-black hover:text-blue-600 transition-colors">
-                        <Github className="w-5 h-5" /> SOURCE CODE
-                      </a>
-                      <a href={project.link} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm font-black hover:text-blue-600 transition-colors">
-                        <ExternalLink className="w-5 h-5" /> LIVE DEMO
-                      </a>
+                      <a href={project.github} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm font-black hover:text-blue-600 transition-colors"><Github className="w-5 h-5" /> SOURCE CODE</a>
+                      <a href={project.link} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm font-black hover:text-blue-600 transition-colors"><ExternalLink className="w-5 h-5" /> LIVE DEMO</a>
                     </div>
                   </div>
                 </motion.div>
@@ -366,67 +326,71 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Footer / Contact - COMPLETAMENTE PERSONALIZADO */}
-        <footer className="py-32">
+        {/* Footer moderno com formulário */}
+        <footer className="py-20 md:py-32">
           <div className="max-w-5xl mx-auto px-6 text-center">
             <motion.div
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 10 }}
               whileInView={{ opacity: 1, y: 0 }}
-              className="bg-gradient-to-br from-gray-900 to-gray-800 dark:from-white dark:to-gray-100 text-white dark:text-gray-900 rounded-[4rem] p-16 md:p-24 relative overflow-hidden shadow-2xl"
+              viewport={{ once: true }}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-green-500/10 rounded-full mb-6 backdrop-blur-sm border border-green-500/20"
             >
-              <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-blue-600/20 to-purple-600/20 pointer-events-none" />
-              
-              {/* Badge de disponibilidade */}
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-500/20 rounded-full mb-6 backdrop-blur-sm">
-                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                <span className="text-sm font-bold">🇵🇹 Lisboa, Portugal - Disponível para oportunidades</span>
-              </div>
-              
-              <h2 className="text-5xl md:text-7xl font-black mb-6 relative z-10 tracking-tighter">
-                Vamos criar algo <br /> extraordinário juntos?
-              </h2>
-              
-              <p className="text-gray-300 dark:text-gray-600 mb-10 relative z-10 max-w-lg mx-auto font-medium">
-                &ldquo;Código eficiente, resultados extraordinários.&rdquo; - Ecleber Monteiro
-              </p>
-              
-              <p className="text-gray-300 dark:text-gray-600 mb-10 relative z-10 max-w-lg mx-auto text-sm">
-                Em busca da primeira oportunidade profissional para aplicar meus conhecimentos, 
-                crescer e agregar valor à sua equipe com responsabilidade, confiança e profissionalismo.
-              </p>
-              
-              <div className="flex flex-col sm:flex-row justify-center gap-6 relative z-10">
-                <a href="mailto:eclebermonteiro26@gmail.com" className="bg-blue-600 hover:bg-blue-700 text-white px-10 py-5 rounded-2xl font-black text-lg hover:scale-105 transition-all shadow-xl inline-flex items-center gap-2">
-                  <Mail className="w-5 h-5" />
-                  ENVIAR EMAIL
-                </a>
-                <a  href="https://www.linkedin.com/in/ecleber-araújo" 
-    target="_blank" 
-    rel="noopener noreferrer" 
-    className="border-2 border-gray-300 dark:border-gray-600 hover:border-blue-500 dark:hover:border-blue-400 
-               text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-black
-               bg-white/50 dark:bg-gray-800/50 hover:bg-blue-50 dark:hover:bg-blue-950/30
-               px-10 py-5 rounded-2xl font-black text-lg hover:scale-105 transition-all inline-flex items-center gap-2">
-                  <Linkedin className="w-5 h-5" />
-                  CONECTAR NO LINKEDIN
-                </a>
-                <a href="https://github.com/getcode7" 
-    target="_blank" 
-    rel="noopener noreferrer" 
-    className="border-2 border-gray-300 dark:border-gray-600 hover:border-blue-500 dark:hover:border-blue-400
-               text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-black
-               bg-white/50 dark:bg-gray-800/50 hover:bg-blue-50 dark:hover:bg-blue-950/30
-               px-10 py-5 rounded-2xl font-black text-lg hover:scale-105 transition-all inline-flex items-center gap-2"
-  >
-                  <Github className="w-5 h-5" />
-                  VER GITHUB
-                </a>
-              </div>
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+              <span className="text-sm font-medium text-green-700 dark:text-green-300">🇵🇹 Lisboa, Portugal – Disponível para oportunidades</span>
             </motion.div>
-            
-            <p className="mt-20 text-gray-400 font-bold tracking-widest uppercase text-[10px]">
+
+            <motion.h2
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-5xl md:text-7xl font-black tracking-tighter text-gray-900 dark:text-white"
+            >
+              Vamos criar algo <br /> extraordinário juntos?
+            </motion.h2>
+
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              className="text-gray-600 dark:text-gray-400 mt-6 max-w-lg mx-auto font-medium"
+            >
+              “Código eficiente, resultados extraordinários.” <br />– Ecleber Monteiro
+            </motion.p>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              className="mt-12"
+            >
+              {!showForm ? (
+                <button
+                  onClick={() => setShowForm(true)}
+                  className="group relative inline-flex items-center gap-2 px-8 py-4 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold text-lg shadow-lg hover:shadow-xl transition-all hover:scale-105 active:scale-95"
+                >
+                  <span>📋 Quero fazer um projeto</span>
+                  <svg className="w-5 h-5 group-hover:translate-x-1 transition" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </svg>
+                </button>
+              ) : (
+                <div className="max-w-2xl mx-auto">
+                  <QuoteForm onSuccess={() => setShowForm(false)} />
+                </div>
+              )}
+            </motion.div>
+
+            <motion.p
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3 }}
+              className="mt-20 text-gray-400 dark:text-gray-500 font-bold tracking-widest uppercase text-[10px]"
+            >
               © {new Date().getFullYear()} Ecleber Monteiro • Engenharia Informática • Lisboa, Portugal
-            </p>
+            </motion.p>
           </div>
         </footer>
       </div>
