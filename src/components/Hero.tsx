@@ -1,7 +1,7 @@
 'use client';
 
 // ============================================================================
-// IMPORTS ORGANIZADOS POR CATEGORIA
+// IMPORTS
 // ============================================================================
 import React, { memo, useCallback, useMemo } from 'react';
 import Image from 'next/image';
@@ -17,21 +17,20 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useLanguage } from '@/hooks/useLanguage';
 
 // ============================================================================
-// 1. CONSTANTES E CONFIGURAÇÕES (Centralizadas e tipadas)
+// 1. CONSTANTES E CONFIGURAÇÕES
 // ============================================================================
 
 /** Dados pessoais - Fonte única da verdade */
 const PERSONAL_DATA = {
   name: "Ecleber Joel Araújo Monteiro",
   shortName: "Ecleber Monteiro",
-  role: "Engenheiro Informático | Front-end & Full Stack",
   location: "Lisboa, Portugal",
   email: "eclebermonteiro26@gmail.com",
   github: "https://github.com/getcode7",
   linkedin: "https://www.linkedin.com/in/ecleber-araújo",
-  bio: "Engenheiro Informático apaixonado por tecnologia e inovação, em busca da primeira oportunidade para transformar linhas de código em soluções que impactam vidas. Com forte compromisso com responsabilidade, confiança e profissionalismo, destaco-me pelo foco incansável em performance e otimização.",
   cvLink: "/mycv.pdf",
   stats: [
     { icon: MapPin, label: "Lisboa, Portugal", color: "text-blue-500" },
@@ -41,7 +40,7 @@ const PERSONAL_DATA = {
   keywords: ["Responsabilidade", "Confiança", "Profissionalismo", "Performance"]
 } as const;
 
-/** Configurações de animação - Valores mágicos eliminados */
+/** Configurações de animação */
 const ANIMATION = {
   container: { staggerChildren: 0.1, delayChildren: 0.3 },
   item: { type: 'spring' as const, stiffness: 100, y: 20 },
@@ -51,7 +50,7 @@ const ANIMATION = {
   spin: { duration: 1.5, repeat: Infinity }
 } as const;
 
-/** Seletores DOM - Evita strings hardcoded */
+/** Seletores DOM */
 const DOM_IDS = {
   projects: 'projects'
 } as const;
@@ -68,7 +67,7 @@ const STYLES = {
 } as const;
 
 // ============================================================================
-// 2. VARIANTES DE ANIMAÇÃO (Memoizadas para performance)
+// 2. VARIANTES DE ANIMAÇÃO
 // ============================================================================
 
 const containerVariants: Variants = {
@@ -107,11 +106,12 @@ const photoVariants: Variants = {
 };
 
 // ============================================================================
-// 3. COMPONENTE PRINCIPAL (Memoizado)
+// 3. COMPONENTE PRINCIPAL
 // ============================================================================
 
 export const Hero = memo(function Hero() {
-  // Callbacks memoizados para evitar recriação em cada render
+  const { t, language } = useLanguage();
+  
   const handleProjectsClick = useCallback(() => {
     const projectsSection = document.getElementById(DOM_IDS.projects);
     if (projectsSection) {
@@ -126,11 +126,15 @@ export const Hero = memo(function Hero() {
       <div className={STYLES.container}>
         <div className={STYLES.grid}>
           
-          {/* COLUNA ESQUERDA - FOTO E BADGES */}
-          <PhotoColumn />
+          {/* COLUNA ESQUERDA - FOTO E BADGES - PASSA language E t */}
+          <PhotoColumn t={t} language={language} />
 
           {/* COLUNA DIREITA - CONTEÚDO PRINCIPAL */}
-          <ContentColumn onProjectsClick={handleProjectsClick} />
+          <ContentColumn 
+            onProjectsClick={handleProjectsClick}
+            t={t}
+            language={language}
+          />
           
         </div>
       </div>
@@ -141,7 +145,7 @@ export const Hero = memo(function Hero() {
 });
 
 // ============================================================================
-// 4. SUB-COMPONENTES (Organizados por responsabilidade)
+// 4. SUB-COMPONENTES
 // ============================================================================
 
 /** Componente de decoração de fundo */
@@ -156,7 +160,13 @@ const BackgroundDecoration = memo(function BackgroundDecoration() {
 });
 
 /** Coluna da foto com badges flutuantes */
-const PhotoColumn = memo(function PhotoColumn() {
+const PhotoColumn = memo(function PhotoColumn({ 
+  t, 
+  language 
+}: { 
+  t: any;
+  language: string;
+}) {
   return (
     <motion.div
       variants={photoVariants}
@@ -188,7 +198,7 @@ const PhotoColumn = memo(function PhotoColumn() {
           </div>
         </div>
 
-        {/* Badge de status (disponível) */}
+        {/* Badge de status (disponível) - TRADUZIDO */}
         <FloatingBadge 
           position="bottom-right" 
           className="bg-white/90 dark:bg-gray-800/90"
@@ -196,11 +206,11 @@ const PhotoColumn = memo(function PhotoColumn() {
         >
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-            <span className="text-xs md:text-sm font-bold">Disponível</span>
+            <span className="text-xs md:text-sm font-bold">{t.hero.available}</span>
           </div>
         </FloatingBadge>
 
-        {/* Badge de experiência */}
+        {/* Badge de experiência - CORRIGIDO */}
         <FloatingBadge 
           position="top-left" 
           className="bg-gradient-to-r from-blue-500 to-purple-600 text-white"
@@ -208,7 +218,9 @@ const PhotoColumn = memo(function PhotoColumn() {
         >
           <div className="text-center">
             <div className="font-black text-lg md:text-2xl">4+</div>
-            <div className="text-white/80 text-[10px] md:text-xs font-bold uppercase">Anos</div>
+            <div className="text-white/80 text-[10px] md:text-xs font-bold uppercase">
+              {t.badge.years}
+            </div>
           </div>
         </FloatingBadge>
       </div>
@@ -218,9 +230,13 @@ const PhotoColumn = memo(function PhotoColumn() {
 
 /** Coluna de conteúdo principal */
 const ContentColumn = memo(function ContentColumn({ 
-  onProjectsClick 
+  onProjectsClick,
+  t,
+  language
 }: { 
-  onProjectsClick: () => void 
+  onProjectsClick: () => void;
+  t: any;
+  language: string;
 }) {
   return (
     <motion.div
@@ -236,13 +252,15 @@ const ContentColumn = memo(function ContentColumn({
           <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
         </span>
         <span className="text-sm font-bold text-blue-600 dark:text-blue-400">
-          👋 Disponível para oportunidades
+          👋 {t.hero.available}
         </span>
       </motion.div>
 
       {/* Título principal */}
       <motion.h1 variants={itemVariants} className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black tracking-tighter mb-6 leading-[1.1]">
-        <span className="block text-gray-900 dark:text-white">Olá, sou</span>
+        <span className="block text-gray-900 dark:text-white">
+          {language === 'pt' ? 'Olá, sou' : "Hi, I'm"}
+        </span>
         <span className={STYLES.gradientText}>
           {PERSONAL_DATA.shortName}
         </span>
@@ -259,8 +277,10 @@ const ContentColumn = memo(function ContentColumn({
           mb-6 
           leading-relaxed 
           hyphens-auto
-          break-words            mx-auto">
-        {PERSONAL_DATA.role}
+          break-words
+          mx-auto
+          lg:mx-0">
+        {t.hero.subtitle}
       </motion.p>
 
       {/* Bio */}
@@ -276,8 +296,9 @@ const ContentColumn = memo(function ContentColumn({
             text-justify 
             hyphens-auto
             break-words
-            mx-auto">
-        {PERSONAL_DATA.bio}
+            mx-auto
+            lg:mx-0">
+        {t.hero.description}
       </motion.p>
 
       {/* Keywords */}
@@ -287,7 +308,10 @@ const ContentColumn = memo(function ContentColumn({
       <StatsSection />
 
       {/* Botões de ação */}
-      <ActionButtons onProjectsClick={onProjectsClick} />
+      <ActionButtons 
+        onProjectsClick={onProjectsClick}
+        t={t}
+      />
 
       {/* Links sociais */}
       <SocialLinksSection />
@@ -328,11 +352,13 @@ const StatsSection = memo(function StatsSection() {
   );
 });
 
-/** Botões de ação (Projetos e CV) */
+/** Botões de ação */
 const ActionButtons = memo(function ActionButtons({ 
-  onProjectsClick 
+  onProjectsClick,
+  t
 }: { 
-  onProjectsClick: () => void 
+  onProjectsClick: () => void;
+  t: any;
 }) {
   return (
     <motion.div variants={itemVariants} className="flex flex-wrap justify-center lg:justify-start gap-4 mb-10">
@@ -341,7 +367,7 @@ const ActionButtons = memo(function ActionButtons({
         className={STYLES.primaryButton}
         onClick={onProjectsClick}
       >
-        VER PROJETOS
+        {t.hero.ctaProjects}
         <ChevronRight className="w-5 h-5 ml-1 group-hover:translate-x-1 transition-transform" />
       </Button>
 
@@ -351,7 +377,7 @@ const ActionButtons = memo(function ActionButtons({
         className={STYLES.secondaryButton}
       >
         <Download className="w-5 h-5" />
-        DOWNLOAD CV
+        {t.common.downloadCV}
       </a>
     </motion.div>
   );
@@ -380,7 +406,7 @@ const SocialLinksSection = memo(function SocialLinksSection() {
 });
 
 // ============================================================================
-// 5. COMPONENTES UTILITÁRIOS (Reutilizáveis)
+// 5. COMPONENTES UTILITÁRIOS
 // ============================================================================
 
 /** Badge flutuante com animação */
@@ -390,10 +416,10 @@ const FloatingBadge = memo(function FloatingBadge({
   className = '', 
   delay 
 }: { 
-  children: React.ReactNode
-  position: 'top-left' | 'bottom-right'
-  className?: string
-  delay: number
+  children: React.ReactNode;
+  position: 'top-left' | 'bottom-right';
+  className?: string;
+  delay: number;
 }) {
   const positionClasses = position === 'top-left' 
     ? '-top-4 -left-4 md:-top-6 md:-left-6' 
@@ -417,9 +443,9 @@ const SocialLink = memo(function SocialLink({
   icon: Icon, 
   label 
 }: { 
-  href: string
-  icon: React.ComponentType<{ className?: string }>
-  label: string
+  href: string;
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
 }) {
   return (
     <a
@@ -460,7 +486,7 @@ const ScrollIndicator = memo(function ScrollIndicator() {
 });
 
 // ============================================================================
-// 6. NAMED EXPORTS PARA COMPONENTES INDIVIDUAIS (Opcional)
+// 6. NAMED EXPORTS
 // ============================================================================
 export { 
   BackgroundDecoration, 
