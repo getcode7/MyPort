@@ -12,9 +12,9 @@ export const translations = {
     
     // Stats
     stats: {
-      years: "Years of Study",
-      projects: "Projects Developed",
-      technologies: "Technologies Mastered",
+      years: "4+ Years of Study",
+      projects: "15+ Projects Developed",
+      technologies: "8+ Technologies Mastered",
       dedication: "Dedication & Focus"
     },
     
@@ -39,7 +39,7 @@ export const translations = {
       }
     },
     
-    // Experience - ATUALIZADO COM ITEMS
+    // Experience
     experience: {
       title: "Trajectory & Education",
       subtitle: "My journey in the tech world",
@@ -74,7 +74,29 @@ export const translations = {
       title: "Technical Expertise",
       subtitle: "Technologies I master with a ",
       focus: "focus on performance",
-      proficiency: "Proficiency"
+      proficiency: "Proficiency",
+      list: [
+        {
+          name: "Frontend",
+          description: "Creation of responsive and performant interfaces",
+          items: ["React", "Next.js", "TypeScript", "Tailwind"]
+        },
+        {
+          name: "Backend",
+          description: "Efficient and scalable APIs",
+          items: ["Node.js", "Python", "Java", "Go"]
+        },
+        {
+          name: "Database",
+          description: "Modeling and query optimization",
+          items: ["PostgreSQL", "MongoDB", "Redis"]
+        },
+        {
+          name: "DevOps",
+          description: "Automation and versioning",
+          items: ["Docker", "Git", "CI/CD", "AWS Basics"]
+        }
+      ]
     },
     
     // Projects
@@ -92,7 +114,57 @@ export const translations = {
         firebase: "Firebase"
       },
       code: "Code",
-      demo: "Demo"
+      demo: "Demo",
+      list: [
+        {
+          title: "Intelligent Management System",
+          description: "Developed as a final course project, uses AI for real-time resource optimization. Focus on performance and efficient data processing.",
+          impact: "🏆 Academic highlight project",
+          tech: ["React", "Node.js", "Python", "PostgreSQL"],
+          link: "https://github.com/getcode7/gestao-inteligente",
+          github: "https://github.com/getcode7/gestao-inteligente"
+        },
+        {
+          title: "High-Performance E-commerce",
+          description: "Scalable platform focused on UX and performance optimization. Implementation of lazy loading and optimized assets for better experience.",
+          impact: "⚡ Optimized performance",
+          tech: ["Next.js", "Tailwind CSS", "TypeScript", "Prisma"],
+          link: "https://ecommerce-getcode7.vercel.app",
+          github: "https://github.com/getcode7/ecommerce-performance"
+        },
+        {
+          title: "Microservices API",
+          description: "Robust architecture for data processing using Docker and Kubernetes. Demonstrating knowledge in scalability and cloud.",
+          impact: "☁️ Modern architecture",
+          tech: ["Go", "Docker", "Redis", "gRPC"],
+          link: "https://github.com/getcode7/microservices-api",
+          github: "https://github.com/getcode7/microservices-api"
+        },
+        {
+          title: "Real-time Delivery App",
+          description: "Mobile app for deliveries with real-time tracking, route optimization and push notifications.",
+          impact: "📱 Mobile first",
+          tech: ["React Native", "Firebase", "Mapbox", "Node.js"],
+          link: "https://github.com/getcode7/delivery-app",
+          github: "https://github.com/getcode7/delivery-app"
+        },
+        {
+          title: "Interactive Analytics Dashboard",
+          description: "Administrative dashboard with interactive charts, real-time data analysis and customizable reports.",
+          impact: "📊 Data driven",
+          tech: ["Vue.js", "D3.js", "Express", "MongoDB"],
+          link: "https://github.com/getcode7/analytics-dashboard",
+          github: "https://github.com/getcode7/analytics-dashboard"
+        },
+        {
+          title: "Enterprise Authentication System",
+          description: "Complete authentication solution with JWT, OAuth2, 2FA and permission management for enterprise applications.",
+          impact: "🔐 Security focused",
+          tech: ["Next.js", "Auth.js", "Prisma", "PostgreSQL"],
+          link: "https://github.com/getcode7/auth-enterprise",
+          github: "https://github.com/getcode7/auth-enterprise"
+        }
+      ]
     },
     
     // Footer
@@ -100,7 +172,7 @@ export const translations = {
       title: "Let's create something extraordinary together?",
       subtitle: "“Efficient code, extraordinary results.” — Ecleber Monteiro",
       cta: "📋 I want to start a project",
-      location: "Lisbon, Portugal – Available for opportunities",
+      location: "Lisbon, Portugal",
       copyright: "Ecleber Monteiro • Computer Engineering • Lisbon, Portugal"
     },
     
@@ -123,9 +195,9 @@ export const translations = {
     
     // Stats
     stats: {
-      years: "Anos de Estudo em TI",
-      projects: "Projetos Desenvolvidos",
-      technologies: "Tecnologias Dominadas",
+      years: "4+ Anos de Estudo",
+      projects: "15+ Projetos Desenvolvidos",
+      technologies: "8+ Tecnologias Dominadas",
       dedication: "Dedicação & Foco"
     },
     
@@ -150,7 +222,7 @@ export const translations = {
       }
     },
     
-    // Experience - ATUALIZADO COM ITEMS
+    // Experience
     experience: {
       title: "Trajetória & Formação",
       subtitle: "Minha jornada no mundo da tecnologia",
@@ -185,7 +257,29 @@ export const translations = {
       title: "Expertise Técnica",
       subtitle: "Tecnologias que domino com ",
       focus: "foco em performance",
-      proficiency: "Proficiência"
+      proficiency: "Proficiência",
+      list: [
+        {
+          name: "Frontend",
+          description: "Criação de interfaces responsivas e performáticas",
+          items: ["React", "Next.js", "TypeScript", "Tailwind"]
+        },
+        {
+          name: "Backend",
+          description: "APIs eficientes e escaláveis",
+          items: ["Node.js", "Python", "Java", "Go"]
+        },
+        {
+          name: "Database",
+          description: "Modelagem e otimização de queries",
+          items: ["PostgreSQL", "MongoDB", "Redis"]
+        },
+        {
+          name: "DevOps",
+          description: "Automação e versionamento",
+          items: ["Docker", "Git", "CI/CD", "AWS Básico"]
+        }
+      ]
     },
     
     // Projects
@@ -203,7 +297,57 @@ export const translations = {
         firebase: "Firebase"
       },
       code: "Código",
-      demo: "Demo"
+      demo: "Demo",
+      list: [
+        {
+          title: "Sistema de Gestão Inteligente",
+          description: "Desenvolvido como projeto final de curso, utiliza IA para otimização de recursos em tempo real. Foco em performance e processamento eficiente de dados.",
+          impact: "🏆 Projeto de destaque acadêmico",
+          tech: ["React", "Node.js", "Python", "PostgreSQL"],
+          link: "https://github.com/getcode7/gestao-inteligente",
+          github: "https://github.com/getcode7/gestao-inteligente"
+        },
+        {
+          title: "E-commerce de Alta Performance",
+          description: "Plataforma escalável com foco em UX e otimização de performance. Implementação de lazy loading e assets otimizados para melhor experiência.",
+          impact: "⚡ Performance otimizada",
+          tech: ["Next.js", "Tailwind CSS", "TypeScript", "Prisma"],
+          link: "https://ecommerce-getcode7.vercel.app",
+          github: "https://github.com/getcode7/ecommerce-performance"
+        },
+        {
+          title: "API de Microserviços",
+          description: "Arquitetura robusta para processamento de dados utilizando Docker e Kubernetes. Projeto demonstrando conhecimentos em escalabilidade e cloud.",
+          impact: "☁️ Arquitetura moderna",
+          tech: ["Go", "Docker", "Redis", "gRPC"],
+          link: "https://github.com/getcode7/microservices-api",
+          github: "https://github.com/getcode7/microservices-api"
+        },
+        {
+          title: "App de Delivery em Tempo Real",
+          description: "Aplicativo mobile para entregas com rastreamento em tempo real, otimização de rotas e notificações push integradas.",
+          impact: "📱 Mobile first",
+          tech: ["React Native", "Firebase", "Mapbox", "Node.js"],
+          link: "https://github.com/getcode7/delivery-app",
+          github: "https://github.com/getcode7/delivery-app"
+        },
+        {
+          title: "Dashboard Analytics Interativo",
+          description: "Painel administrativo com gráficos interativos, análise de dados em tempo real e relatórios personalizáveis para tomada de decisão.",
+          impact: "📊 Data driven",
+          tech: ["Vue.js", "D3.js", "Express", "MongoDB"],
+          link: "https://github.com/getcode7/analytics-dashboard",
+          github: "https://github.com/getcode7/analytics-dashboard"
+        },
+        {
+          title: "Sistema de Autenticação Enterprise",
+          description: "Solução completa de autenticação com JWT, OAuth2, 2FA e gerenciamento de permissões para aplicações enterprise.",
+          impact: "🔐 Security focused",
+          tech: ["Next.js", "Auth.js", "Prisma", "PostgreSQL"],
+          link: "https://github.com/getcode7/auth-enterprise",
+          github: "https://github.com/getcode7/auth-enterprise"
+        }
+      ]
     },
     
     // Footer
@@ -211,13 +355,13 @@ export const translations = {
       title: "Vamos criar algo extraordinário juntos?",
       subtitle: "“Código eficiente, resultados extraordinários.” — Ecleber Monteiro",
       cta: "📋 Quero fazer um projeto",
-      location: "Lisboa, Portugal – Disponível para oportunidades",
+      location: "Lisboa, Portugal",
       copyright: "Ecleber Monteiro • Engenharia Informática • Lisboa, Portugal"
     },
     
     // Common
     common: {
-      downloadCV: "Download CV"
+      downloadCV: "Baixar CV"
     }
   }
 };

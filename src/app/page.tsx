@@ -2,171 +2,43 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  Globe, Github, Linkedin, Mail, ExternalLink, 
-  Terminal, Database, Layers, Award, Target, 
+import {
+  Globe, Github, Linkedin, Mail, ExternalLink,
+  Terminal, Database, Layers, Award, Target,
   Code2, Sparkles, FileText, MapPin, Calendar, CheckCircle
 } from 'lucide-react';
 import { Hero } from '@/components/Hero';
 import { QuoteForm } from '@/components/QuoteForm';
-// import { LanguageToggle } from '@/components/LanguageToggle'; // (não usado no JSX)
 import { useLanguage } from '@/hooks/useLanguage';
 
 // ============================================
-// DADOS - COMPLETOS
+// MAPEAMENTO DE ÍCONES PARA SKILLS
 // ============================================
+const skillIcons: Record<string, React.ReactNode> = {
+  Frontend: <Globe className="w-5 h-5" />,
+  Backend: <Terminal className="w-5 h-5" />,
+  Database: <Database className="w-5 h-5" />,
+  DevOps: <Layers className="w-5 h-5" />,
+};
 
-const PROJECTS = [
-  {
-    title: "Sistema de Gestão Inteligente",
-    description: "Desenvolvido como projeto final de curso, utiliza IA para otimização de recursos em tempo real. Foco em performance e processamento eficiente de dados.",
-    tech: ["React", "Node.js", "Python", "PostgreSQL"],
-    link: "https://github.com/getcode7/gestao-inteligente",
-    github: "https://github.com/getcode7/gestao-inteligente",
-    impact: "🏆 Projeto de destaque acadêmico",
-    color: "from-blue-500 to-indigo-600"
-  },
-  {
-    title: "E-commerce de Alta Performance",
-    description: "Plataforma escalável com foco em UX e otimização de performance. Implementação de lazy loading e assets otimizados para melhor experiência.",
-    tech: ["Next.js", "Tailwind CSS", "TypeScript", "Prisma"],
-    link: "https://ecommerce-getcode7.vercel.app",
-    github: "https://github.com/getcode7/ecommerce-performance",
-    impact: "⚡ Performance otimizada",
-    color: "from-purple-500 to-pink-600"
-  },
-  {
-    title: "API de Microserviços",
-    description: "Arquitetura robusta para processamento de dados utilizando Docker e Kubernetes. Projeto demonstrando conhecimentos em escalabilidade e cloud.",
-    tech: ["Go", "Docker", "Redis", "gRPC"],
-    link: "https://github.com/getcode7/microservices-api",
-    github: "https://github.com/getcode7/microservices-api",
-    impact: "☁️ Arquitetura moderna",
-    color: "from-green-500 to-teal-600"
-  },
-  {
-    title: "App de Delivery em Tempo Real",
-    description: "Aplicativo mobile para entregas com rastreamento em tempo real, otimização de rotas e notificações push integradas.",
-    tech: ["React Native", "Firebase", "Mapbox", "Node.js"],
-    link: "https://github.com/getcode7/delivery-app",
-    github: "https://github.com/getcode7/delivery-app",
-    impact: "📱 Mobile first",
-    color: "from-orange-500 to-red-600"
-  },
-  {
-    title: "Dashboard Analytics Interativo",
-    description: "Painel administrativo com gráficos interativos, análise de dados em tempo real e relatórios personalizáveis para tomada de decisão.",
-    tech: ["Vue.js", "D3.js", "Express", "MongoDB"],
-    link: "https://github.com/getcode7/analytics-dashboard",
-    github: "https://github.com/getcode7/analytics-dashboard",
-    impact: "📊 Data driven",
-    color: "from-yellow-500 to-amber-600"
-  },
-  {
-    title: "Sistema de Autenticação Enterprise",
-    description: "Solução completa de autenticação com JWT, OAuth2, 2FA e gerenciamento de permissões para aplicações enterprise.",
-    tech: ["Next.js", "Auth.js", "Prisma", "PostgreSQL"],
-    link: "https://github.com/getcode7/auth-enterprise",
-    github: "https://github.com/getcode7/auth-enterprise",
-    impact: "🔐 Security focused",
-    color: "from-cyan-500 to-blue-600"
-  }
-];
-
-const SKILLS = [
-  { 
-    name: "Frontend", 
-    icon: <Globe className="w-5 h-5" />, 
-    items: ["React", "Next.js", "TypeScript", "Tailwind"],
-    level: "90%",
-    description: "Criação de interfaces responsivas e performáticas"
-  },
-  { 
-    name: "Backend", 
-    icon: <Terminal className="w-5 h-5" />, 
-    items: ["Node.js", "Python", "Java", "Go"],
-    level: "85%",
-    description: "APIs eficientes e escaláveis"
-  },
-  { 
-    name: "Database", 
-    icon: <Database className="w-5 h-5" />, 
-    items: ["PostgreSQL", "MongoDB", "Redis"],
-    level: "80%",
-    description: "Modelagem e otimização de queries"
-  },
-  { 
-    name: "DevOps", 
-    icon: <Layers className="w-5 h-5" />, 
-    items: ["Docker", "Git", "CI/CD", "AWS Básico"],
-    level: "75%",
-    description: "Automação e versionamento"
-  }
-];
-
-const SOFT_SKILLS = [
-  { 
-    name: "Resolução de Problemas", 
-    icon: <Target className="w-5 h-5" />, 
-    description: "Capacidade analítica para encontrar soluções eficientes e inovadoras" 
-  },
-  { 
-    name: "Comunicação Técnica", 
-    icon: <Sparkles className="w-5 h-5" />, 
-    description: "Explico conceitos complexos de forma clara e acessível a todos os níveis" 
-  },
-  { 
-    name: "Aprendizagem Contínua", 
-    icon: <Award className="w-5 h-5" />, 
-    description: "Atualização constante com as últimas tecnologias e melhores práticas" 
-  },
-  { 
-    name: "Trabalho em Equipa", 
-    icon: <Code2 className="w-5 h-5" />, 
-    description: "Colaboração eficaz em projetos multidisciplinares com foco em resultados" 
-  }
-];
-
-const EXPERIENCES = [
-  {
-    company: "Projetos Acadêmicos & Pessoais",
-    role: "Desenvolvedor Full Stack (Projetos Próprios)",
-    period: "2023 - Presente",
-    achievements: [
-      "Desenvolvimento de projetos completos utilizando React, Node.js e PostgreSQL",
-      "Implementação de práticas de performance otimizando tempo de carregamento",
-      "Utilização de Git e GitHub para versionamento e colaboração",
-      "Criação de aplicações responsivas com foco em experiência do usuário"
-    ]
-  },
-  {
-    company: "Formação Acadêmica",
-    role: "Engenharia Informática",
-    period: "2019 - 2024",
-    achievements: [
-      "Conclusão do curso com projetos práticos em desenvolvimento web e mobile",
-      "Desenvolvimento de projeto final: Sistema de Gestão Inteligente com IA",
-      "Participação em workshops e hackathons de tecnologia",
-      "Foco em arquitetura de software e boas práticas de desenvolvimento"
-    ]
-  }
-];
-
-const STATS = [
-  { value: "4+", label: "Anos de Estudo em TI", icon: "🎓" },
-  { value: "15+", label: "Projetos Desenvolvidos", icon: "💻" },
-  { value: "8+", label: "Tecnologias Dominadas", icon: "🚀" },
-  { value: "100%", label: "Dedicação & Foco", icon: "⭐" }
-];
+// ============================================
+// COMPONENTE PRINCIPAL
+// ============================================
 
 export default function Home() {
   const { t, language } = useLanguage();
   const [showForm, setShowForm] = useState(false);
   const [filter, setFilter] = useState('all');
 
-  const filteredProjects = filter === 'all' 
-    ? PROJECTS 
-    : PROJECTS.filter(p => p.tech.some(tech => tech.toLowerCase().includes(filter)));
+  // Dados traduzidos
+  const projects = t.projects.list || [];
+  const skills = t.technicalSkills.list || [];
+  const experiences = t.experience.items || [];
+
+  // Filtragem de projetos
+  const filteredProjects = filter === 'all'
+    ? projects
+    : projects.filter((p: any) => p.tech.some((tech: string) => tech.toLowerCase().includes(filter)));
 
   // Mapeamento de filtros para tradução
   const filterLabels: Record<string, string> = {
@@ -179,9 +51,17 @@ export default function Home() {
     firebase: t.projects.filters.firebase,
   };
 
+  // Estatísticas (valores fixos, labels traduzidos)
+  const statsData = [
+    { value: "4+", icon: "🎓", labelKey: "years" },
+    { value: "15+", icon: "💻", labelKey: "projects" },
+    { value: "8+", icon: "🚀", labelKey: "technologies" },
+    { value: "100%", icon: "⭐", labelKey: "dedication" }
+  ];
+
   return (
     <main className="min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 selection:bg-blue-100 dark:selection:bg-blue-900 relative overflow-hidden">
-      
+
       {/* Efeito de Fundo Global */}
       <div className="fixed inset-0 z-0 pointer-events-none">
         <motion.div
@@ -202,10 +82,6 @@ export default function Home() {
       </div>
 
       <div className="relative z-10">
-        {/* <div className="fixed top-4 right-4 z-50">
-          <LanguageToggle />
-        </div> */}
-
         <Hero />
 
         {/* Botão de Download CV */}
@@ -216,8 +92,8 @@ export default function Home() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
             >
-              <a 
-                href="/mycv.pdf" 
+              <a
+                href="/mycv.pdf"
                 download
                 className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full font-bold text-lg shadow-lg hover:shadow-xl transition-all hover:scale-105 active:scale-95"
               >
@@ -233,7 +109,7 @@ export default function Home() {
         <section className="py-20">
           <div className="max-w-5xl mx-auto px-6">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              {STATS.map((stat, idx) => (
+              {statsData.map((stat, idx) => (
                 <motion.div
                   key={idx}
                   initial={{ opacity: 0, y: 20 }}
@@ -263,7 +139,12 @@ export default function Home() {
               <p className="text-gray-500 dark:text-gray-400 font-medium max-w-2xl mx-auto">{t.softSkills.subtitle}</p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {SOFT_SKILLS.map((skill, idx) => (
+              {[
+                { icon: <Target className="w-5 h-5" />, nameKey: "problemSolving", descKey: "problemSolvingDesc" },
+                { icon: <Sparkles className="w-5 h-5" />, nameKey: "technicalCommunication", descKey: "technicalCommunicationDesc" },
+                { icon: <Award className="w-5 h-5" />, nameKey: "continuousLearning", descKey: "continuousLearningDesc" },
+                { icon: <Code2 className="w-5 h-5" />, nameKey: "teamwork", descKey: "teamworkDesc" },
+              ].map((skill, idx) => (
                 <motion.div
                   key={idx}
                   initial={{ opacity: 0, scale: 0.9 }}
@@ -273,16 +154,10 @@ export default function Home() {
                 >
                   <div className="w-14 h-14 mx-auto mb-4 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center text-white shadow-lg">{skill.icon}</div>
                   <h3 className="text-xl font-black mb-2">
-                    {idx === 0 && t.softSkills.skills.problemSolving}
-                    {idx === 1 && t.softSkills.skills.technicalCommunication}
-                    {idx === 2 && t.softSkills.skills.continuousLearning}
-                    {idx === 3 && t.softSkills.skills.teamwork}
+                    {t.softSkills.skills[skill.nameKey as keyof typeof t.softSkills.skills]}
                   </h3>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    {idx === 0 && t.softSkills.skills.problemSolvingDesc}
-                    {idx === 1 && t.softSkills.skills.technicalCommunicationDesc}
-                    {idx === 2 && t.softSkills.skills.continuousLearningDesc}
-                    {idx === 3 && t.softSkills.skills.teamworkDesc}
+                    {t.softSkills.skills[skill.descKey as keyof typeof t.softSkills.skills]}
                   </p>
                 </motion.div>
               ))}
@@ -290,7 +165,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Experiência e Formação */}
+        {/* Experiência e Formação (traduzida) */}
         <section className="py-20">
           <div className="max-w-5xl mx-auto px-6">
             <div className="mb-16">
@@ -298,7 +173,7 @@ export default function Home() {
               <p className="text-gray-500 dark:text-gray-400 font-medium">{t.experience.subtitle}</p>
             </div>
             <div className="space-y-8">
-              {EXPERIENCES.map((exp, idx) => (
+              {experiences.map((exp: any, idx: number) => (
                 <motion.div
                   key={idx}
                   initial={{ opacity: 0, x: -20 }}
@@ -319,7 +194,7 @@ export default function Home() {
                       </span>
                     </div>
                     <ul className="space-y-2">
-                      {exp.achievements.map((ach, i) => (
+                      {exp.achievements.map((ach: string, i: number) => (
                         <li key={i} className="flex items-start gap-2 text-gray-600 dark:text-gray-400">
                           <CheckCircle className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
                           <span>{ach}</span>
@@ -333,7 +208,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Skills Técnicas */}
+        {/* Skills Técnicas (traduzida) */}
         <section className="py-32" id="skills">
           <div className="max-w-5xl mx-auto px-6">
             <div className="flex flex-col md:flex-row md:items-end justify-between mb-20 gap-6">
@@ -347,47 +222,52 @@ export default function Home() {
               <div className="h-[2px] flex-1 bg-gradient-to-r from-blue-600 to-transparent hidden md:block mb-4 ml-10 opacity-30" />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {SKILLS.map((skill, index) => (
-                <motion.div
-                  key={skill.name}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 }}
-                  className="p-8 bg-white/40 dark:bg-gray-900/40 backdrop-blur-md rounded-[2rem] border border-white/50 dark:border-gray-800/50 hover:border-blue-500/50 transition-all group"
-                >
-                  <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center text-white mb-6 shadow-lg shadow-blue-500/20 group-hover:rotate-6 transition-transform">{skill.icon}</div>
-                  <h3 className="text-xl font-black mb-2">{skill.name}</h3>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-6">{skill.description}</p>
-                  <ul className="space-y-2 mb-6">
-                    {skill.items.map(item => (
-                      <li key={item} className="flex items-center gap-2 text-sm font-bold text-gray-600 dark:text-gray-400">
-                        <div className="w-1.5 h-1.5 bg-blue-500 rounded-full" />
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                  <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
-                    <div className="flex justify-between text-xs mb-1">
-                      <span>{t.technicalSkills.proficiency}</span>
-                      <span className="font-bold text-blue-500">{skill.level}</span>
+              {skills.map((skill: any, index: number) => {
+                const icon = skillIcons[skill.name] || <Globe className="w-5 h-5" />;
+                return (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: index * 0.1 }}
+                    className="p-8 bg-white/40 dark:bg-gray-900/40 backdrop-blur-md rounded-[2rem] border border-white/50 dark:border-gray-800/50 hover:border-blue-500/50 transition-all group"
+                  >
+                    <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center text-white mb-6 shadow-lg shadow-blue-500/20 group-hover:rotate-6 transition-transform">
+                      {icon}
                     </div>
-                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
-                      <motion.div
-                        initial={{ width: 0 }}
-                        whileInView={{ width: skill.level }}
-                        transition={{ duration: 1, delay: 0.5 }}
-                        className="bg-gradient-to-r from-blue-500 to-purple-500 h-full rounded-full"
-                      />
+                    <h3 className="text-xl font-black mb-2">{skill.name}</h3>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-6">{skill.description}</p>
+                    <ul className="space-y-2 mb-6">
+                      {skill.items.map((item: string) => (
+                        <li key={item} className="flex items-center gap-2 text-sm font-bold text-gray-600 dark:text-gray-400">
+                          <div className="w-1.5 h-1.5 bg-blue-500 rounded-full" />
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                    <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                      <div className="flex justify-between text-xs mb-1">
+                        <span>{t.technicalSkills.proficiency}</span>
+                        <span className="font-bold text-blue-500">{(index + 1) * 5 + 70}%</span>
+                      </div>
+                      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
+                        <motion.div
+                          initial={{ width: 0 }}
+                          whileInView={{ width: `${(index + 1) * 5 + 70}%` }}
+                          transition={{ duration: 1, delay: 0.5 }}
+                          className="bg-gradient-to-r from-blue-500 to-purple-500 h-full rounded-full"
+                        />
+                      </div>
                     </div>
-                  </div>
-                </motion.div>
-              ))}
+                  </motion.div>
+                );
+              })}
             </div>
           </div>
         </section>
 
-        {/* Projects Section com Filtros */}
+        {/* Projects Section com Filtros (traduzida) */}
         <section className="py-32" id="projects">
           <div className="max-w-5xl mx-auto px-6">
             <div className="mb-20">
@@ -396,16 +276,15 @@ export default function Home() {
                 {t.projects.subtitle}
                 <span className="text-purple-500 font-bold">{t.projects.focus}</span>
               </p>
-              
+
               {/* Filtros de Tecnologia */}
               <div className="flex flex-wrap gap-2 mt-6">
                 <button
                   onClick={() => setFilter('all')}
-                  className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${
-                    filter === 'all' 
-                      ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg' 
+                  className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${filter === 'all'
+                      ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg'
                       : 'bg-gray-200/50 dark:bg-gray-800/50 text-gray-600 dark:text-gray-400 hover:bg-gray-300/50 dark:hover:bg-gray-700/50'
-                  }`}
+                    }`}
                 >
                   {t.projects.filters.all}
                 </button>
@@ -413,11 +292,10 @@ export default function Home() {
                   <button
                     key={tech}
                     onClick={() => setFilter(tech)}
-                    className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${
-                      filter === tech 
-                        ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg' 
+                    className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${filter === tech
+                        ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg'
                         : 'bg-gray-200/50 dark:bg-gray-800/50 text-gray-600 dark:text-gray-400 hover:bg-gray-300/50 dark:hover:bg-gray-700/50'
-                    }`}
+                      }`}
                   >
                     {filterLabels[tech] || tech}
                   </button>
@@ -426,9 +304,9 @@ export default function Home() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-              {filteredProjects.map((project, index) => (
+              {filteredProjects.map((project: any, index: number) => (
                 <motion.div
-                  key={project.title}
+                  key={index}
                   initial={{ opacity: 0, y: 40 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
@@ -440,7 +318,7 @@ export default function Home() {
                   </div>
                   <div className="p-8 flex flex-col flex-1">
                     <div className="flex gap-2 mb-6 flex-wrap">
-                      {project.tech.map(t => (
+                      {project.tech.map((t: string) => (
                         <span key={t} className="text-[10px] font-black uppercase tracking-widest text-blue-600 dark:text-blue-400 bg-blue-50/50 dark:bg-blue-900/30 px-3 py-1 rounded-full border border-blue-100/50 dark:border-blue-800/50">{t}</span>
                       ))}
                     </div>
@@ -518,7 +396,7 @@ export default function Home() {
                   <QuoteForm onSuccess={() => setShowForm(false)} />
                 </div>
               )}
-              
+
               <div className="flex gap-6 mt-8">
                 <a href="https://github.com/getcode7" target="_blank" rel="noopener noreferrer" className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
                   <Github className="w-6 h-6" />

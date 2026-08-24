@@ -23,20 +23,14 @@ import { useLanguage } from '@/hooks/useLanguage';
 // 1. CONSTANTES E CONFIGURAÇÕES
 // ============================================================================
 
-/** Dados pessoais - Fonte única da verdade */
+/** Dados pessoais - Fonte única da verdade (apenas dados que não mudam com idioma) */
 const PERSONAL_DATA = {
   name: "Ecleber Joel Araújo Monteiro",
   shortName: "Ecleber Monteiro",
-  location: "Lisboa, Portugal",
   email: "eclebermonteiro26@gmail.com",
   github: "https://github.com/getcode7",
   linkedin: "https://www.linkedin.com/in/ecleber-araújo",
   cvLink: "/mycv.pdf",
-  stats: [
-    { icon: MapPin, label: "Lisboa, Portugal", color: "text-blue-500" },
-    { icon: Calendar, label: "4+ anos de estudo", color: "text-purple-500" },
-    { icon: Award, label: "15+ projetos", color: "text-orange-500" },
-  ],
   keywords: ["Responsabilidade", "Confiança", "Profissionalismo", "Performance"]
 } as const;
 
@@ -126,10 +120,10 @@ export const Hero = memo(function Hero() {
       <div className={STYLES.container}>
         <div className={STYLES.grid}>
           
-          {/* COLUNA ESQUERDA - FOTO E BADGES - PASSA language E t */}
+          {/* COLUNA ESQUERDA - FOTO E BADGES */}
           <PhotoColumn t={t} language={language} />
 
-          {/* COLUNA DIREITA - CONTEÚDO PRINCIPAL */}
+          {/* COLUNA DIREITA - CONTEÚDO PRINCIPAL (sem badge disponível) */}
           <ContentColumn 
             onProjectsClick={handleProjectsClick}
             t={t}
@@ -198,7 +192,7 @@ const PhotoColumn = memo(function PhotoColumn({
           </div>
         </div>
 
-        {/* Badge de status (disponível) - TRADUZIDO */}
+        {/* Badge de status (disponível) - MANTIDO NA IMAGEM */}
         <FloatingBadge 
           position="bottom-right" 
           className="bg-white/90 dark:bg-gray-800/90"
@@ -210,7 +204,7 @@ const PhotoColumn = memo(function PhotoColumn({
           </div>
         </FloatingBadge>
 
-        {/* Badge de experiência - CORRIGIDO */}
+        {/* Badge de experiência */}
         <FloatingBadge 
           position="top-left" 
           className="bg-gradient-to-r from-blue-500 to-purple-600 text-white"
@@ -228,7 +222,7 @@ const PhotoColumn = memo(function PhotoColumn({
   );
 });
 
-/** Coluna de conteúdo principal */
+/** Coluna de conteúdo principal (sem badge disponível) */
 const ContentColumn = memo(function ContentColumn({ 
   onProjectsClick,
   t,
@@ -245,16 +239,7 @@ const ContentColumn = memo(function ContentColumn({
       animate="visible"
       className="text-center lg:text-left"
     >
-      {/* Badge de status com animação de ping */}
-      <motion.div variants={itemVariants} className={STYLES.statusBadge}>
-        <span className="relative flex h-2 w-2">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-          <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-        </span>
-        <span className="text-sm font-bold text-blue-600 dark:text-blue-400">
-          👋 {t.hero.available}
-        </span>
-      </motion.div>
+      {/* REMOVIDO: Badge de status com animação de ping - já não aparece */}
 
       {/* Título principal */}
       <motion.h1 variants={itemVariants} className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black tracking-tighter mb-6 leading-[1.1]">
@@ -304,8 +289,8 @@ const ContentColumn = memo(function ContentColumn({
       {/* Keywords */}
       <KeywordsSection />
 
-      {/* Stats */}
-      <StatsSection />
+      {/* Stats - traduzido */}
+      <StatsSection t={t} />
 
       {/* Botões de ação */}
       <ActionButtons 
@@ -335,11 +320,17 @@ const KeywordsSection = memo(function KeywordsSection() {
   );
 });
 
-/** Seção de estatísticas */
-const StatsSection = memo(function StatsSection() {
+/** Seção de estatísticas - traduzida */
+const StatsSection = memo(function StatsSection({ t }: { t: any }) {
+  const stats = [
+    { icon: MapPin, label: t.footer.location, color: "text-blue-500" },
+    { icon: Calendar, label: t.stats.years, color: "text-purple-500" },
+    { icon: Award, label: t.stats.projects, color: "text-orange-500" },
+  ];
+
   return (
     <motion.div variants={itemVariants} className="flex flex-wrap justify-center lg:justify-start gap-4 mb-8">
-      {PERSONAL_DATA.stats.map((stat, index) => (
+      {stats.map((stat, index) => (
         <div 
           key={index} 
           className="flex items-center gap-2 px-4 py-2 bg-white/40 dark:bg-gray-900/40 backdrop-blur-sm rounded-full border border-gray-200 dark:border-gray-800"

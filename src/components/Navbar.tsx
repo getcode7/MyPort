@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import { Menu, X, Sun, Moon } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -38,38 +37,55 @@ export function Navbar() {
   const { scrollY } = useScroll();
   const [activeSection, setActiveSection] = useState('home');
 
-  // Obter os items de navegação conforme o idioma
   const navItems = NAV_ITEMS[language] || NAV_ITEMS.pt;
 
-  // Detectar secção ativa
+  // ================================================================
+  // LÓGICA DE DETEÇÃO DA SECÇÃO ATIVA (BASEADA EM SCROLL)
+  // ================================================================
   useEffect(() => {
     const sections = ['home', 'projects', 'skills', 'contact'];
-    const observers: IntersectionObserver[] = [];
 
-    sections.forEach((sectionId) => {
-      const element = document.getElementById(sectionId);
-      if (element) {
-        const observer = new IntersectionObserver(
-          ([entry]) => {
-            if (entry.isIntersecting) {
-              setActiveSection(sectionId);
-            }
-          },
-          { threshold: 0.3 }
-        );
-        observer.observe(element);
-        observers.push(observer);
+    const updateActiveSection = () => {
+      const scrollPosition = window.scrollY + 120; // offset para compensar a navbar
+
+      // Se estiver no topo, definir 'home'
+      if (scrollPosition < 150) {
+        setActiveSection('home');
+        return;
       }
-    });
 
-    return () => {
-      observers.forEach((observer) => observer.disconnect());
+      let currentSection = 'home';
+      for (const sectionId of sections) {
+        const element = document.getElementById(sectionId);
+        if (element) {
+          const offsetTop = element.offsetTop;
+          const offsetBottom = offsetTop + element.offsetHeight;
+          if (scrollPosition >= offsetTop && scrollPosition < offsetBottom) {
+            currentSection = sectionId;
+            break;
+          }
+        }
+      }
+      setActiveSection(currentSection);
     };
+
+    // Atualizar ao montar e a cada scroll
+    updateActiveSection();
+    window.addEventListener('scroll', updateActiveSection);
+
+    return () => window.removeEventListener('scroll', updateActiveSection);
   }, []);
 
-  // Scroll suave para âncoras
+  // Scroll suave com fallback para 'home'
   const scrollToSection = (href: string) => {
     const sectionId = href.replace('#', '');
+
+    if (sectionId === 'home') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      setIsMobileMenuOpen(false);
+      return;
+    }
+
     const element = document.getElementById(sectionId);
     if (element) {
       const navbarHeight = 80;
@@ -82,7 +98,6 @@ export function Navbar() {
     setIsMobileMenuOpen(false);
   };
 
-  // Opacidade da navbar com o scroll
   const navOpacity = useTransform(scrollY, [0, 50], [1, 0.92]);
 
   return (
@@ -132,13 +147,6 @@ export function Navbar() {
                           `}
                         >
                           {item.name}
-                          {isActive && (
-                            <motion.div
-                              layoutId="navbar-indicator"
-                              className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-0.5 bg-blue-600 dark:bg-blue-400 rounded-full"
-                              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                            />
-                          )}
                         </button>
                       );
                     })}
@@ -147,23 +155,16 @@ export function Navbar() {
 
                 {/* AÇÕES */}
                 <div className="flex items-center gap-1 sm:gap-2 shrink-0">
-                  {/* Toggle de Tema */}
                   <button
                     onClick={toggleTheme}
                     className="p-2 rounded-lg bg-white/40 dark:bg-gray-800/40 backdrop-blur-md hover:bg-white/60 dark:hover:bg-gray-700/60 border border-white/40 dark:border-gray-700/40 transition-all shadow-sm"
                     aria-label={theme === 'dark' ? 'Mudar para tema claro' : 'Mudar para tema escuro'}
                   >
-                    {theme === 'dark' ? (
-                      <Sun size={15} className="text-yellow-500" />
-                    ) : (
-                      <Moon size={15} className="text-gray-700" />
-                    )}
+                    {theme === 'dark' ? <Sun size={15} className="text-yellow-500" /> : <Moon size={15} className="text-gray-700" />}
                   </button>
 
-                  {/* Language Toggle - BOTÃO DE IDIOMA */}
                   <LanguageToggle />
 
-                  {/* Menu Mobile Button */}
                   <button
                     onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                     className="md:hidden p-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100/50 dark:hover:bg-gray-800/50 rounded-lg transition-colors"
@@ -212,7 +213,6 @@ export function Navbar() {
                         `}
                       >
                         {item.name}
-                        <div className={`w-1.5 h-1.5 rounded-full bg-blue-500 transition-opacity ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`} />
                       </button>
                     );
                   })}
