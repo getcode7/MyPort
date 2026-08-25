@@ -7,15 +7,16 @@ import { ThemeProvider } from '@/contexts/ThemeContext';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { Navbar } from '@/components/Navbar';
 import { InteractiveBackground } from '@/components/InteractiveBackground';
-import { Inter } from 'next/font/google';
+// @ts-expect-error TypeScript may not have a declaration for CSS side-effect imports.
 import './globals.css';
-
+import { FloatingWhatsApp } from '@/components/FloatingWhatsApp';
+import { Inter } from 'next/font/google';   // Importa o componente Inter para otimizar a fonte
 // ============================================================================
 // 1. CONFIGURAÇÕES DE FONTE
 // ============================================================================
 
 /** Fonte Inter com configurações otimizadas */
-const inter = Inter({ 
+const inter = Inter({
   subsets: ['latin'],
   display: 'swap', // Otimiza performance de carregamento
   preload: true,   // Pré-carrega a fonte
@@ -68,8 +69,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html 
-      lang="pt" 
+    <html
+      lang="pt"
       suppressHydrationWarning
       className="h-full"
     >
@@ -91,6 +92,8 @@ export default function RootLayout({
             <main className={MAIN_CLASSES}>
               {children}
             </main>
+
+            <FloatingWhatsApp />
           </LanguageProvider>
         </ThemeProvider>
       </body>

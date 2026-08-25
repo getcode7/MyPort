@@ -84,26 +84,7 @@ export default function Home() {
       <div className="relative z-10">
         <Hero />
 
-        {/* Botão de Download CV */}
-        <section className="py-10">
-          <div className="max-w-5xl mx-auto px-6 text-center">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-            >
-              <a
-                href="/mycv.pdf"
-                download
-                className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full font-bold text-lg shadow-lg hover:shadow-xl transition-all hover:scale-105 active:scale-95"
-              >
-                <FileText className="w-5 h-5" />
-                {t.common.downloadCV}
-                <ExternalLink className="w-4 h-4" />
-              </a>
-            </motion.div>
-          </div>
-        </section>
+        {/* ❌ SECÇÃO DE DOWNLOAD REMOVIDA – apenas o botão no Hero permanece */}
 
         {/* Estatísticas */}
         <section className="py-20">
@@ -339,8 +320,8 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Footer */}
-        <footer className="py-20 md:py-32">
+        {/* Footer com ID contact adicionado */}
+        <footer id="contact" className="py-20 md:py-32">
           <div className="max-w-5xl mx-auto px-6 text-center">
             <motion.div
               initial={{ opacity: 0, y: 10 }}
@@ -397,14 +378,15 @@ export default function Home() {
                 </div>
               )}
 
-              <div className="flex gap-6 mt-8">
+              {/* Apenas links sociais (sem WhatsAppButton) */}
+              <div className="flex flex-wrap items-center justify-center gap-4 mt-8">
                 <a href="https://github.com/getcode7" target="_blank" rel="noopener noreferrer" className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
                   <Github className="w-6 h-6" />
                 </a>
                 <a href="https://linkedin.com/in/getcode7" target="_blank" rel="noopener noreferrer" className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
                   <Linkedin className="w-6 h-6" />
                 </a>
-                <a href="mailto:ecleber@myport.dev" className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                <a href="mailto:ecleber.dev@outlook.com" className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
                   <Mail className="w-6 h-6" />
                 </a>
               </div>

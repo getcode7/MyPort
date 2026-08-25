@@ -23,7 +23,6 @@ import { useLanguage } from '@/hooks/useLanguage';
 // 1. CONSTANTES E CONFIGURAÇÕES
 // ============================================================================
 
-/** Dados pessoais - Fonte única da verdade (apenas dados que não mudam com idioma) */
 const PERSONAL_DATA = {
   name: "Ecleber Joel Araújo Monteiro",
   shortName: "Ecleber Monteiro",
@@ -31,10 +30,8 @@ const PERSONAL_DATA = {
   github: "https://github.com/getcode7",
   linkedin: "https://www.linkedin.com/in/ecleber-araújo",
   cvLink: "/mycv.pdf",
-  keywords: ["Responsabilidade", "Confiança", "Profissionalismo", "Performance"]
 } as const;
 
-/** Configurações de animação */
 const ANIMATION = {
   container: { staggerChildren: 0.1, delayChildren: 0.3 },
   item: { type: 'spring' as const, stiffness: 100, y: 20 },
@@ -44,20 +41,18 @@ const ANIMATION = {
   spin: { duration: 1.5, repeat: Infinity }
 } as const;
 
-/** Seletores DOM */
 const DOM_IDS = {
   projects: 'projects'
 } as const;
 
-/** Classes CSS reutilizáveis */
 const STYLES = {
-  section: "relative min-h-screen flex items-center justify-center overflow-hidden px-6 py-20 pt-32 md:pt-40",
+  section: "relative min-h-screen flex items-center justify-center overflow-hidden px-4 sm:px-6 py-16 sm:py-20 pt-24 sm:pt-32 md:pt-40",
   container: "relative z-10 max-w-7xl mx-auto w-full",
-  grid: "grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center",
+  grid: "grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-20 items-center",
   gradientText: "bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent",
-  statusBadge: "inline-flex items-center gap-2 px-4 py-2 bg-blue-500/10 backdrop-blur-sm border border-blue-500/20 rounded-full mb-6",
-  primaryButton: "group bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-2xl px-8 h-14 text-base font-bold shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95",
-  secondaryButton: "inline-flex items-center gap-2 px-6 h-14 rounded-2xl font-bold text-base border-2 border-gray-300 dark:border-gray-700 hover:border-blue-500 hover:bg-blue-500/10 transition-all"
+  statusBadge: "inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-blue-500/10 backdrop-blur-sm border border-blue-500/20 rounded-full mb-4 sm:mb-6",
+  primaryButton: "group bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-2xl px-6 sm:px-8 h-12 sm:h-14 text-sm sm:text-base font-bold shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95",
+  secondaryButton: "inline-flex items-center gap-2 px-5 sm:px-6 h-12 sm:h-14 rounded-2xl font-bold text-sm sm:text-base border-2 border-gray-300 dark:border-gray-700 hover:border-blue-500 hover:bg-blue-500/10 transition-all"
 } as const;
 
 // ============================================================================
@@ -119,17 +114,12 @@ export const Hero = memo(function Hero() {
       
       <div className={STYLES.container}>
         <div className={STYLES.grid}>
-          
-          {/* COLUNA ESQUERDA - FOTO E BADGES */}
           <PhotoColumn t={t} language={language} />
-
-          {/* COLUNA DIREITA - CONTEÚDO PRINCIPAL (sem badge disponível) */}
           <ContentColumn 
             onProjectsClick={handleProjectsClick}
             t={t}
             language={language}
           />
-          
         </div>
       </div>
 
@@ -142,41 +132,30 @@ export const Hero = memo(function Hero() {
 // 4. SUB-COMPONENTES
 // ============================================================================
 
-/** Componente de decoração de fundo */
 const BackgroundDecoration = memo(function BackgroundDecoration() {
   return (
     <div className="absolute inset-0 z-0 pointer-events-none select-none" aria-hidden="true">
-      <div className="absolute top-20 left-10 w-96 h-96 bg-blue-500/15 rounded-full blur-[120px] animate-pulse" />
-      <div className="absolute bottom-20 right-10 w-96 h-96 bg-purple-500/15 rounded-full blur-[120px] animate-pulse delay-1000" />
+      <div className="absolute top-20 left-10 w-64 sm:w-96 h-64 sm:h-96 bg-blue-500/15 rounded-full blur-[120px] animate-pulse" />
+      <div className="absolute bottom-20 right-10 w-64 sm:w-96 h-64 sm:h-96 bg-purple-500/15 rounded-full blur-[120px] animate-pulse delay-1000" />
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:40px_40px]" />
     </div>
   );
 });
 
-/** Coluna da foto com badges flutuantes */
-const PhotoColumn = memo(function PhotoColumn({ 
-  t, 
-  language 
-}: { 
-  t: any;
-  language: string;
-}) {
+const PhotoColumn = memo(function PhotoColumn({ t, language }: { t: any; language: string }) {
   return (
     <motion.div
       variants={photoVariants}
       initial="hidden"
       animate="visible"
-      className="relative flex justify-center lg:justify-end"
+      className="relative flex justify-center lg:justify-end order-first lg:order-none"
     >
       <div className="relative">
-        {/* Efeito de brilho externo */}
         <div className="absolute inset-0 bg-gradient-to-tr from-blue-500 via-purple-500 to-pink-500 rounded-full blur-3xl opacity-30 animate-pulse" />
         
-        {/* Container da foto com borda animada */}
-        <div className="relative w-72 h-72 md:w-96 md:h-96 lg:w-[450px] lg:h-[450px]">
+        <div className="relative w-56 h-56 sm:w-72 sm:h-72 md:w-80 md:h-80 lg:w-[450px] lg:h-[450px]">
           <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 animate-spin-slow p-1" />
           
-          {/* Foto de perfil */}
           <div className="relative w-full h-full rounded-full overflow-hidden bg-gradient-to-br from-blue-600 to-purple-700 p-1">
             <div className="w-full h-full rounded-full overflow-hidden relative">
               <Image 
@@ -186,33 +165,31 @@ const PhotoColumn = memo(function PhotoColumn({
                 priority
                 className="object-cover scale-110 opacity-80"
                 style={{ objectPosition: '90% 80%' }}
-                sizes="(max-width: 768px) 288px, (max-width: 1024px) 384px, 450px"
+                sizes="(max-width: 640px) 224px, (max-width: 768px) 288px, (max-width: 1024px) 320px, 450px"
               />
             </div>
           </div>
         </div>
 
-        {/* Badge de status (disponível) - MANTIDO NA IMAGEM */}
         <FloatingBadge 
           position="bottom-right" 
           className="bg-white/90 dark:bg-gray-800/90"
           delay={ANIMATION.badge.delay1}
         >
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-            <span className="text-xs md:text-sm font-bold">{t.hero.available}</span>
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-green-500 rounded-full animate-pulse" />
+            <span className="text-[10px] sm:text-xs md:text-sm font-bold">{t.hero.available}</span>
           </div>
         </FloatingBadge>
 
-        {/* Badge de experiência */}
         <FloatingBadge 
           position="top-left" 
           className="bg-gradient-to-r from-blue-500 to-purple-600 text-white"
           delay={ANIMATION.badge.delay2}
         >
           <div className="text-center">
-            <div className="font-black text-lg md:text-2xl">4+</div>
-            <div className="text-white/80 text-[10px] md:text-xs font-bold uppercase">
+            <div className="font-black text-base sm:text-lg md:text-2xl">4+</div>
+            <div className="text-white/80 text-[8px] sm:text-[10px] md:text-xs font-bold uppercase">
               {t.badge.years}
             </div>
           </div>
@@ -222,7 +199,6 @@ const PhotoColumn = memo(function PhotoColumn({
   );
 });
 
-/** Coluna de conteúdo principal (sem badge disponível) */
 const ContentColumn = memo(function ContentColumn({ 
   onProjectsClick,
   t,
@@ -239,11 +215,18 @@ const ContentColumn = memo(function ContentColumn({
       animate="visible"
       className="text-center lg:text-left"
     >
-      {/* REMOVIDO: Badge de status com animação de ping - já não aparece */}
+      <motion.div variants={itemVariants} className={STYLES.statusBadge}>
+        <span className="relative flex h-1.5 w-1.5 sm:h-2 sm:w-2">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+          <span className="relative inline-flex rounded-full h-full w-full bg-green-500"></span>
+        </span>
+        <span className="text-[10px] sm:text-xs md:text-sm font-bold text-blue-600 dark:text-blue-400">
+          👋 {t.hero.available}
+        </span>
+      </motion.div>
 
-      {/* Título principal */}
-      <motion.h1 variants={itemVariants} className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black tracking-tighter mb-6 leading-[1.1]">
-        <span className="block text-gray-900 dark:text-white">
+      <motion.h1 variants={itemVariants} className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl font-black tracking-tighter mb-3 sm:mb-4 md:mb-6 leading-[1.1]">
+        <span className="block text-gray-900 dark:text-white text-base sm:text-lg md:text-xl lg:text-2xl font-medium tracking-normal">
           {language === 'pt' ? 'Olá, sou' : "Hi, I'm"}
         </span>
         <span className={STYLES.gradientText}>
@@ -251,15 +234,13 @@ const ContentColumn = memo(function ContentColumn({
         </span>
       </motion.h1>
 
-      {/* Role / Cargo */}
       <motion.p variants={itemVariants} className="
-          text-xl 
-          md:text-2xl 
+          text-base sm:text-lg md:text-xl lg:text-2xl 
           font-bold 
           text-gray-600 
           dark:text-gray-300 
           max-w-2xl 
-          mb-6 
+          mb-4 sm:mb-6 
           leading-relaxed 
           hyphens-auto
           break-words
@@ -268,15 +249,13 @@ const ContentColumn = memo(function ContentColumn({
         {t.hero.subtitle}
       </motion.p>
 
-      {/* Bio */}
       <motion.p variants={itemVariants} className="
-            text-base 
-            md:text-lg 
+            text-sm sm:text-base md:text-lg 
             text-gray-500 
             dark:text-gray-400 
             max-w-2xl 
             lg:max-w-full 
-            mb-6 
+            mb-4 sm:mb-6 
             leading-relaxed 
             text-justify 
             hyphens-auto
@@ -286,32 +265,21 @@ const ContentColumn = memo(function ContentColumn({
         {t.hero.description}
       </motion.p>
 
-      {/* Keywords */}
-      <KeywordsSection />
-
-      {/* Stats - traduzido */}
+      <KeywordsSection t={t} />
       <StatsSection t={t} />
-
-      {/* Botões de ação */}
-      <ActionButtons 
-        onProjectsClick={onProjectsClick}
-        t={t}
-      />
-
-      {/* Links sociais */}
+      <ActionButtons onProjectsClick={onProjectsClick} t={t} />
       <SocialLinksSection />
     </motion.div>
   );
 });
 
-/** Seção de keywords */
-const KeywordsSection = memo(function KeywordsSection() {
+const KeywordsSection = memo(function KeywordsSection({ t }: { t: any }) {
   return (
-    <motion.div variants={itemVariants} className="flex flex-wrap justify-center lg:justify-start gap-2 mb-8">
-      {PERSONAL_DATA.keywords.map((keyword) => (
+    <motion.div variants={itemVariants} className="flex flex-wrap justify-center lg:justify-start gap-1.5 sm:gap-2 mb-4 sm:mb-6 md:mb-8">
+      {t.hero.keywords.map((keyword: string) => (
         <span 
           key={keyword} 
-          className="px-3 py-1.5 text-xs font-bold rounded-full bg-blue-500/5 text-blue-600 dark:text-blue-400 border border-blue-500/10 backdrop-blur-sm"
+          className="px-2 sm:px-3 py-1 text-[9px] sm:text-[10px] md:text-xs font-bold rounded-full bg-blue-500/5 text-blue-600 dark:text-blue-400 border border-blue-500/10 backdrop-blur-sm"
         >
           ✦ {keyword}
         </span>
@@ -320,7 +288,6 @@ const KeywordsSection = memo(function KeywordsSection() {
   );
 });
 
-/** Seção de estatísticas - traduzida */
 const StatsSection = memo(function StatsSection({ t }: { t: any }) {
   const stats = [
     { icon: MapPin, label: t.footer.location, color: "text-blue-500" },
@@ -329,21 +296,20 @@ const StatsSection = memo(function StatsSection({ t }: { t: any }) {
   ];
 
   return (
-    <motion.div variants={itemVariants} className="flex flex-wrap justify-center lg:justify-start gap-4 mb-8">
+    <motion.div variants={itemVariants} className="flex flex-wrap justify-center lg:justify-start gap-2 sm:gap-3 md:gap-4 mb-4 sm:mb-6 md:mb-8">
       {stats.map((stat, index) => (
         <div 
           key={index} 
-          className="flex items-center gap-2 px-4 py-2 bg-white/40 dark:bg-gray-900/40 backdrop-blur-sm rounded-full border border-gray-200 dark:border-gray-800"
+          className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-white/40 dark:bg-gray-900/40 backdrop-blur-sm rounded-full border border-gray-200 dark:border-gray-800"
         >
-          <stat.icon className={`w-4 h-4 ${stat.color}`} />
-          <span className="text-sm font-medium">{stat.label}</span>
+          <stat.icon className={`w-3 h-3 sm:w-4 sm:h-4 ${stat.color}`} />
+          <span className="text-[10px] sm:text-xs md:text-sm font-medium truncate max-w-[120px] sm:max-w-none">{stat.label}</span>
         </div>
       ))}
     </motion.div>
   );
 });
 
-/** Botões de ação */
 const ActionButtons = memo(function ActionButtons({ 
   onProjectsClick,
   t
@@ -352,14 +318,14 @@ const ActionButtons = memo(function ActionButtons({
   t: any;
 }) {
   return (
-    <motion.div variants={itemVariants} className="flex flex-wrap justify-center lg:justify-start gap-4 mb-10">
+    <motion.div variants={itemVariants} className="flex flex-wrap justify-center lg:justify-start gap-2 sm:gap-3 md:gap-4 mb-6 sm:mb-8 md:mb-10">
       <Button 
         size="lg" 
         className={STYLES.primaryButton}
         onClick={onProjectsClick}
       >
         {t.hero.ctaProjects}
-        <ChevronRight className="w-5 h-5 ml-1 group-hover:translate-x-1 transition-transform" />
+        <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 ml-1 group-hover:translate-x-1 transition-transform" />
       </Button>
 
       <a 
@@ -367,14 +333,14 @@ const ActionButtons = memo(function ActionButtons({
         download
         className={STYLES.secondaryButton}
       >
-        <Download className="w-5 h-5" />
-        {t.common.downloadCV}
+        <Download className="w-4 h-4 sm:w-5 sm:h-5" />
+        <span className="hidden xs:inline">{t.common.downloadCV}</span>
+        <span className="xs:hidden">CV</span>
       </a>
     </motion.div>
   );
 });
 
-/** Links para redes sociais */
 const SocialLinksSection = memo(function SocialLinksSection() {
   const socialLinks = useMemo(() => [
     { href: PERSONAL_DATA.github, icon: Github, label: "GitHub" },
@@ -383,7 +349,7 @@ const SocialLinksSection = memo(function SocialLinksSection() {
   ], []);
 
   return (
-    <motion.div variants={itemVariants} className="flex justify-center lg:justify-start gap-4">
+    <motion.div variants={itemVariants} className="flex justify-center lg:justify-start gap-2 sm:gap-3 md:gap-4">
       {socialLinks.map((link) => (
         <SocialLink 
           key={link.label}
@@ -400,7 +366,6 @@ const SocialLinksSection = memo(function SocialLinksSection() {
 // 5. COMPONENTES UTILITÁRIOS
 // ============================================================================
 
-/** Badge flutuante com animação */
 const FloatingBadge = memo(function FloatingBadge({ 
   children, 
   position, 
@@ -413,22 +378,21 @@ const FloatingBadge = memo(function FloatingBadge({
   delay: number;
 }) {
   const positionClasses = position === 'top-left' 
-    ? '-top-4 -left-4 md:-top-6 md:-left-6' 
-    : '-bottom-4 -right-4 md:-bottom-6 md:-right-6';
+    ? '-top-3 -left-3 sm:-top-4 sm:-left-4 md:-top-6 md:-left-6' 
+    : '-bottom-3 -right-3 sm:-bottom-4 sm:-right-4 md:-bottom-6 md:-right-6';
   
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ delay, type: ANIMATION.badge.type }}
-      className={`absolute ${positionClasses} backdrop-blur-md rounded-2xl shadow-2xl p-3 md:p-4 border border-gray-200/50 dark:border-gray-700/50 ${className}`}
+      className={`absolute ${positionClasses} backdrop-blur-md rounded-xl sm:rounded-2xl shadow-2xl p-2 sm:p-3 md:p-4 border border-gray-200/50 dark:border-gray-700/50 ${className}`}
     >
       {children}
     </motion.div>
   );
 });
 
-/** Link social com tooltip */
 const SocialLink = memo(function SocialLink({ 
   href, 
   icon: Icon, 
@@ -443,34 +407,36 @@ const SocialLink = memo(function SocialLink({
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="group relative p-3 rounded-2xl bg-white/40 dark:bg-gray-900/40 backdrop-blur-sm border border-gray-200 dark:border-gray-800 hover:border-blue-500 hover:bg-blue-500/10 transition-all duration-300"
+      className="group relative p-2 sm:p-3 rounded-xl sm:rounded-2xl bg-white/40 dark:bg-gray-900/40 backdrop-blur-sm border border-gray-200 dark:border-gray-800 hover:border-blue-500 hover:bg-blue-500/10 transition-all duration-300"
       aria-label={label}
     >
-      <Icon className="w-5 h-5 group-hover:scale-110 group-hover:text-blue-500 transition-all duration-300" />
-      <span className="absolute -top-10 left-1/2 -translate-x-1/2 text-[10px] bg-gray-900 text-white px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+      <Icon className="w-4 h-4 sm:w-5 sm:h-5 group-hover:scale-110 group-hover:text-blue-500 transition-all duration-300" />
+      <span className="absolute -top-8 sm:-top-10 left-1/2 -translate-x-1/2 text-[8px] sm:text-[10px] bg-gray-900 text-white px-1.5 sm:px-2 py-0.5 sm:py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
         {label}
       </span>
     </a>
   );
 });
 
-/** Indicador de scroll animado */
 const ScrollIndicator = memo(function ScrollIndicator() {
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ delay: ANIMATION.scrollIndicator.delay, duration: ANIMATION.scrollIndicator.duration }}
-      className="absolute bottom-8 left-1/2 -translate-x-1/2 hidden lg:block"
+      className="absolute bottom-4 sm:bottom-6 md:bottom-8 left-1/2 -translate-x-1/2 hidden lg:block"
     >
-      <div className="flex flex-col items-center gap-2">
-        <div className="w-5 h-8 border-2 border-gray-400/30 rounded-full flex justify-center">
+      <div className="flex flex-col items-center gap-1.5 sm:gap-2">
+        <div className="w-4 h-6 sm:w-5 sm:h-8 border-2 border-gray-400/30 rounded-full flex justify-center">
           <motion.div
-            animate={{ y: [0, 12, 0] }}
-            transition={{ repeat: ANIMATION.spin.repeat, duration: ANIMATION.spin.duration }}
-            className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2"
+            animate={{ y: [0, 8, 0] }}
+            transition={{ repeat: Infinity, duration: 1.5 }}
+            className="w-1 h-1.5 sm:w-1.5 sm:h-2 bg-blue-500 rounded-full mt-1.5 sm:mt-2"
           />
         </div>
+        <span className="text-[8px] sm:text-[10px] font-bold text-gray-400 dark:text-gray-600 uppercase tracking-widest">
+          Scroll
+        </span>
       </div>
     </motion.div>
   );

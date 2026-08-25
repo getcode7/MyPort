@@ -7,7 +7,8 @@ export const translations = {
       description: "Computer Engineer passionate about technology and innovation, seeking the first opportunity to transform lines of code into solutions that impact lives. With a strong commitment to responsibility, trust, and professionalism, I stand out for my relentless focus on performance and optimization.",
       ctaProjects: "View Projects",
       ctaContact: "Contact Me",
-      available: "Available"
+      available: "Available",
+      keywords: ["Responsibility", "Trust", "Professionalism", "Performance"]
     },
     
     // Stats
@@ -178,7 +179,8 @@ export const translations = {
     
     // Common
     common: {
-      downloadCV: "Download CV"
+      downloadCV: "Download CV",
+      whatsapp: "Chat on WhatsApp"
     }
   },
   
@@ -190,7 +192,8 @@ export const translations = {
       description: "Engenheiro Informático apaixonado por tecnologia e inovação, em busca da primeira oportunidade para transformar linhas de código em soluções que impactam vidas. Com forte compromisso com responsabilidade, confiança e profissionalismo, destaco-me pelo foco incansável em performance e otimização.",
       ctaProjects: "Ver Projetos",
       ctaContact: "Fale Comigo",
-      available: "Disponível"
+      available: "Disponível",
+      keywords: ["Responsabilidade", "Confiança", "Profissionalismo", "Performance"]
     },
     
     // Stats
@@ -361,7 +364,8 @@ export const translations = {
     
     // Common
     common: {
-      downloadCV: "Baixar CV"
+      downloadCV: "Baixar CV",
+      whatsapp: "Falar no WhatsApp"
     }
   }
 };
