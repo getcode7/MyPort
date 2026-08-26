@@ -7,7 +7,6 @@ import { ThemeProvider } from '@/contexts/ThemeContext';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { Navbar } from '@/components/Navbar';
 import { InteractiveBackground } from '@/components/InteractiveBackground';
-// @ts-expect-error TypeScript may not have a declaration for CSS side-effect imports.
 import './globals.css';
 import { FloatingWhatsApp } from '@/components/FloatingWhatsApp';
 import { Inter } from 'next/font/google';   // Importa o componente Inter para otimizar a fonte
