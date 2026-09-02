@@ -8,10 +8,12 @@ import { useLanguage } from '@/hooks/useLanguage';
 import { LanguageToggle } from '@/components/LanguageToggle';
 
 // ============================================================================
-// CONSTANTES - NAVEGAÇÃO TRADUZIDA (ÂNCORAS)
+// CONSTANTES TIPADAS
 // ============================================================================
 
-const NAV_ITEMS = {
+const SECTIONS = ['home', 'projects', 'skills', 'contact'] as const;
+
+const NAV_ITEMS: Record<'en' | 'pt', { name: string; href: string }[]> = {
   en: [
     { name: 'Home', href: '#home' },
     { name: 'Projects', href: '#projects' },
@@ -32,35 +34,31 @@ const NAV_ITEMS = {
 
 export function Navbar() {
   const { language } = useLanguage();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { theme, toggleTheme } = useTheme();
   const { scrollY } = useScroll();
-  const [activeSection, setActiveSection] = useState('home');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState<typeof SECTIONS[number]>('home');
 
   const navItems = NAV_ITEMS[language] || NAV_ITEMS.pt;
 
   // ================================================================
-  // LÓGICA DE DETEÇÃO DA SECÇÃO ATIVA (BASEADA EM SCROLL)
+  // DETEÇÃO DA SECÇÃO ATIVA (BASEADA EM SCROLL)
   // ================================================================
   useEffect(() => {
-    const sections = ['home', 'projects', 'skills', 'contact'];
-
     const updateActiveSection = () => {
-      const scrollPosition = window.scrollY + 120; // offset para compensar a navbar
+      const scrollPosition = window.scrollY + 120;
 
-      // Se estiver no topo, definir 'home'
       if (scrollPosition < 150) {
         setActiveSection('home');
         return;
       }
 
-      let currentSection = 'home';
-      for (const sectionId of sections) {
+      let currentSection: typeof SECTIONS[number] = 'home';
+      for (const sectionId of SECTIONS) {
         const element = document.getElementById(sectionId);
         if (element) {
-          const offsetTop = element.offsetTop;
-          const offsetBottom = offsetTop + element.offsetHeight;
-          if (scrollPosition >= offsetTop && scrollPosition < offsetBottom) {
+          const { offsetTop, offsetHeight } = element;
+          if (scrollPosition >= offsetTop && scrollPosition < offsetTop + offsetHeight) {
             currentSection = sectionId;
             break;
           }
@@ -69,14 +67,15 @@ export function Navbar() {
       setActiveSection(currentSection);
     };
 
-    // Atualizar ao montar e a cada scroll
     updateActiveSection();
-    window.addEventListener('scroll', updateActiveSection);
+    window.addEventListener('scroll', updateActiveSection, { passive: true });
 
     return () => window.removeEventListener('scroll', updateActiveSection);
   }, []);
 
-  // Scroll suave com fallback para 'home'
+  // ================================================================
+  // SCROLL SUAVE
+  // ================================================================
   const scrollToSection = (href: string) => {
     const sectionId = href.replace('#', '');
 
@@ -98,8 +97,14 @@ export function Navbar() {
     setIsMobileMenuOpen(false);
   };
 
+  // ================================================================
+  // OPACIDADE DA NAVBAR COM SCROLL
+  // ================================================================
   const navOpacity = useTransform(scrollY, [0, 50], [1, 0.92]);
 
+  // ================================================================
+  // RENDER
+  // ================================================================
   return (
     <>
       <nav className="fixed top-0 left-0 w-full z-50 pointer-events-none">
@@ -123,6 +128,7 @@ export function Navbar() {
                 <button
                   onClick={() => scrollToSection('#home')}
                   className="group shrink-0 focus:outline-none"
+                  aria-label="Ir para o início"
                 >
                   <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-b from-blue-500 to-blue-600 flex items-center justify-center shadow-[0_2px_0_rgb(30,58,138)] transition-all group-hover:translate-y-[1px] group-hover:shadow-none">
                     <span className="text-white font-bold text-sm">E</span>
@@ -138,6 +144,7 @@ export function Navbar() {
                         <button
                           key={item.name}
                           onClick={() => scrollToSection(item.href)}
+                          aria-current={isActive ? 'page' : undefined}
                           className={`
                             relative px-2 lg:px-3 py-2 text-[11px] lg:text-[12px] font-bold uppercase tracking-wider transition-colors whitespace-nowrap block rounded-lg
                             ${isActive
@@ -204,6 +211,7 @@ export function Navbar() {
                       <button
                         key={item.name}
                         onClick={() => scrollToSection(item.href)}
+                        aria-current={isActive ? 'page' : undefined}
                         className={`
                           px-4 py-3 text-sm font-bold rounded-xl transition-colors flex items-center justify-between group w-full text-left
                           ${isActive

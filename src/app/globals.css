@@ -25,67 +25,29 @@
    ESTILOS GLOBAIS
    =========================================================================== */
 
+/* Box-sizing global */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Scroll suave global */
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
   transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-/* ============================================================================
-   COMPONENTE: NAVBAR GOTA
-   Estilo de gota de água para a navbar
-   =========================================================================== */
-
-/* Container principal da navbar com efeito de gota */
-.navbar-gota {
-  position: relative;
-  border-radius: 0 0 24px 24px;
-  background: rgba(255, 255, 255, 0.95);
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-}
-
-/* Versão dark mode */
-.dark .navbar-gota {
-  background: rgba(17, 24, 39, 0.95);
-}
-
-/* Curva superior da gota (formato de pingo) */
-.navbar-gota::before {
-  content: '';
-  position: absolute;
-  top: -12px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 60px;
-  height: 12px;
-  background: inherit;
-  border-radius: 50% 50% 0 0;
-  filter: blur(2px);
-}
-
-/* Efeito de brilho na gota */
-.navbar-gota::after {
-  content: '';
-  position: absolute;
-  top: -8px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 40px;
-  height: 8px;
-  background: radial-gradient(ellipse, rgba(59, 130, 246, 0.5), transparent);
-  border-radius: 50%;
-  filter: blur(4px);
 }
 
 /* ============================================================================
    ANIMAÇÕES PERSONALIZADAS
    =========================================================================== */
 
-/**
- * Animação de rotação lenta
- * Usada para efeitos de loading ou decoração
- */
 @keyframes spin-slow {
   0% {
     transform: rotate(0deg);
@@ -99,42 +61,42 @@ body {
   animation: spin-slow 8s linear infinite;
 }
 
-/* ============================================================================
-   UTILITÁRIOS PERSONALIZADOS
-   =========================================================================== */
-
-/**
- * Delay para animações
- * Útil para criar efeitos sequenciais
- */
 .delay-1000 {
   animation-delay: 1s;
 }
 
 /* ============================================================================
-   MEDIA QUERIES (Opcional - para futuras melhorias)
-   =========================================================================== */
-
-/* Exemplo: Ajustes para mobile (se necessário no futuro)
-@media (max-width: 768px) {
-  .navbar-gota {
-    border-radius: 0 0 16px 16px;
-  }
-}
-*/
-
-/* ============================================================================
-   UTILITÁRIOS DE ACESSIBILIDADE (Opcional)
+   ACESSIBILIDADE
    =========================================================================== */
 
 /* Redução de movimento para usuários que preferem menos animações */
 @media (prefers-reduced-motion: reduce) {
-  body {
-    transition: none;
-  }
-  
-  .animate-spin-slow {
-    animation: none;
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 
+/* ============================================================================
+   ESTILOS ADICIONAIS (para componentes específicos, se necessário)
+   =========================================================================== */
+
+/* Exemplo: scrollbar personalizada (opcional) */
+/* 
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #3b82f6;
+  border-radius: 4px;
+}
+*/

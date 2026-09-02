@@ -12,8 +12,36 @@ import { QuoteForm } from '@/components/QuoteForm';
 import { useLanguage } from '@/hooks/useLanguage';
 
 // ============================================
+// TIPAGEM DOS DADOS
+// ============================================
+
+interface Project {
+  title: string;
+  description: string;
+  tech: string[];
+  link: string;
+  github: string;
+  impact: string;
+  color: string;
+}
+
+interface Skill {
+  name: string;
+  description: string;
+  items: string[];
+}
+
+interface Experience {
+  company: string;
+  role: string;
+  period: string;
+  achievements: string[];
+}
+
+// ============================================
 // MAPEAMENTO DE ÍCONES PARA SKILLS
 // ============================================
+
 const skillIcons: Record<string, React.ReactNode> = {
   Frontend: <Globe className="w-5 h-5" />,
   Backend: <Terminal className="w-5 h-5" />,
@@ -38,7 +66,7 @@ export default function Home() {
   // Filtragem de projetos
   const filteredProjects = filter === 'all'
     ? projects
-    : projects.filter((p: any) => p.tech.some((tech: string) => tech.toLowerCase().includes(filter)));
+    : projects.filter((p: Project) => p.tech.some((tech: string) => tech.toLowerCase().includes(filter)));
 
   // Mapeamento de filtros para tradução
   const filterLabels: Record<string, string> = {
@@ -51,7 +79,7 @@ export default function Home() {
     firebase: t.projects.filters.firebase,
   };
 
-  // Estatísticas (valores fixos, labels traduzidos)
+  // Dados das estatísticas
   const statsData = [
     { value: "4+", icon: "🎓", labelKey: "years" },
     { value: "15+", icon: "💻", labelKey: "projects" },
@@ -83,8 +111,6 @@ export default function Home() {
 
       <div className="relative z-10">
         <Hero />
-
-        {/* ❌ SECÇÃO DE DOWNLOAD REMOVIDA – apenas o botão no Hero permanece */}
 
         {/* Estatísticas */}
         <section className="py-20">
@@ -146,7 +172,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Experiência e Formação (traduzida) */}
+        {/* Experiência e Formação */}
         <section className="py-20">
           <div className="max-w-5xl mx-auto px-6">
             <div className="mb-16">
@@ -154,7 +180,7 @@ export default function Home() {
               <p className="text-gray-500 dark:text-gray-400 font-medium">{t.experience.subtitle}</p>
             </div>
             <div className="space-y-8">
-              {experiences.map((exp: any, idx: number) => (
+              {experiences.map((exp: Experience, idx: number) => (
                 <motion.div
                   key={idx}
                   initial={{ opacity: 0, x: -20 }}
@@ -175,10 +201,10 @@ export default function Home() {
                       </span>
                     </div>
                     <ul className="space-y-2">
-                      {exp.achievements.map((ach: string, i: number) => (
+                      {exp.achievements.map((achievement: string, i: number) => (
                         <li key={i} className="flex items-start gap-2 text-gray-600 dark:text-gray-400">
                           <CheckCircle className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
-                          <span>{ach}</span>
+                          <span>{achievement}</span>
                         </li>
                       ))}
                     </ul>
@@ -189,7 +215,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Skills Técnicas (traduzida) */}
+        {/* Skills Técnicas */}
         <section className="py-32" id="skills">
           <div className="max-w-5xl mx-auto px-6">
             <div className="flex flex-col md:flex-row md:items-end justify-between mb-20 gap-6">
@@ -203,11 +229,11 @@ export default function Home() {
               <div className="h-[2px] flex-1 bg-gradient-to-r from-blue-600 to-transparent hidden md:block mb-4 ml-10 opacity-30" />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {skills.map((skill: any, index: number) => {
+              {skills.map((skill: Skill, index: number) => {
                 const icon = skillIcons[skill.name] || <Globe className="w-5 h-5" />;
                 return (
                   <motion.div
-                    key={index}
+                    key={skill.name}
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
@@ -248,7 +274,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Projects Section com Filtros (traduzida) */}
+        {/* Projects Section com Filtros */}
         <section className="py-32" id="projects">
           <div className="max-w-5xl mx-auto px-6">
             <div className="mb-20">
@@ -266,6 +292,7 @@ export default function Home() {
                       ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg'
                       : 'bg-gray-200/50 dark:bg-gray-800/50 text-gray-600 dark:text-gray-400 hover:bg-gray-300/50 dark:hover:bg-gray-700/50'
                     }`}
+                  aria-label="Filtrar todos os projetos"
                 >
                   {t.projects.filters.all}
                 </button>
@@ -277,6 +304,7 @@ export default function Home() {
                         ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg'
                         : 'bg-gray-200/50 dark:bg-gray-800/50 text-gray-600 dark:text-gray-400 hover:bg-gray-300/50 dark:hover:bg-gray-700/50'
                       }`}
+                    aria-label={`Filtrar projetos por ${tech}`}
                   >
                     {filterLabels[tech] || tech}
                   </button>
@@ -285,9 +313,9 @@ export default function Home() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-              {filteredProjects.map((project: any, index: number) => (
+              {filteredProjects.map((project: Project, index: number) => (
                 <motion.div
-                  key={index}
+                  key={project.title}
                   initial={{ opacity: 0, y: 40 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
@@ -295,22 +323,32 @@ export default function Home() {
                   className="group relative bg-gray-100/50 dark:bg-gray-900/50 backdrop-blur-sm rounded-[3rem] overflow-hidden border border-gray-200/50 dark:border-gray-800/50 hover:shadow-2xl transition-all flex flex-col"
                 >
                   <div className="absolute top-4 right-4 z-10">
-                    <span className="text-xs font-black px-3 py-1 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg">{project.impact}</span>
+                    <span className="text-xs font-black px-3 py-1 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg">
+                      {project.impact}
+                    </span>
                   </div>
                   <div className="p-8 flex flex-col flex-1">
                     <div className="flex gap-2 mb-6 flex-wrap">
-                      {project.tech.map((t: string) => (
-                        <span key={t} className="text-[10px] font-black uppercase tracking-widest text-blue-600 dark:text-blue-400 bg-blue-50/50 dark:bg-blue-900/30 px-3 py-1 rounded-full border border-blue-100/50 dark:border-blue-800/50">{t}</span>
+                      {project.tech.map((tech: string) => (
+                        <span key={tech} className="text-[10px] font-black uppercase tracking-widest text-blue-600 dark:text-blue-400 bg-blue-50/50 dark:bg-blue-900/30 px-3 py-1 rounded-full border border-blue-100/50 dark:border-blue-800/50">
+                          {tech}
+                        </span>
                       ))}
                     </div>
-                    <h3 className="text-2xl font-black mb-3 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-blue-600 group-hover:to-purple-600 transition-all">{project.title}</h3>
-                    <p className="text-gray-600 dark:text-gray-400 font-medium mb-6 leading-relaxed text-sm flex-1">{project.description}</p>
+                    <h3 className="text-2xl font-black mb-3 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-blue-600 group-hover:to-purple-600 transition-all">
+                      {project.title}
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-400 font-medium mb-6 leading-relaxed text-sm flex-1">
+                      {project.description}
+                    </p>
                     <div className="flex gap-4 mt-4 pt-4 border-t border-gray-200/50 dark:border-gray-700/50">
                       <a href={project.github} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-xs font-black hover:text-blue-600 transition-colors">
-                        <Github className="w-4 h-4" /> {t.projects.code}
+                        <Github className="w-4 h-4" />
+                        {t.projects.code}
                       </a>
                       <a href={project.link} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-xs font-black hover:text-blue-600 transition-colors">
-                        <ExternalLink className="w-4 h-4" /> {t.projects.demo}
+                        <ExternalLink className="w-4 h-4" />
+                        {t.projects.demo}
                       </a>
                     </div>
                   </div>
@@ -320,7 +358,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Footer com ID contact adicionado */}
+        {/* Footer */}
         <footer id="contact" className="py-20 md:py-32">
           <div className="max-w-5xl mx-auto px-6 text-center">
             <motion.div
@@ -378,15 +416,14 @@ export default function Home() {
                 </div>
               )}
 
-              {/* Apenas links sociais (sem WhatsAppButton) */}
               <div className="flex flex-wrap items-center justify-center gap-4 mt-8">
-                <a href="https://github.com/getcode7" target="_blank" rel="noopener noreferrer" className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                <a href="https://github.com/getcode7" target="_blank" rel="noopener noreferrer" className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors" aria-label="GitHub">
                   <Github className="w-6 h-6" />
                 </a>
-                <a href="https://linkedin.com/in/getcode7" target="_blank" rel="noopener noreferrer" className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                <a href="https://linkedin.com/in/getcode7" target="_blank" rel="noopener noreferrer" className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors" aria-label="LinkedIn">
                   <Linkedin className="w-6 h-6" />
                 </a>
-                <a href="mailto:ecleber.dev@outlook.com" className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                <a href="mailto:ecleber.dev@outlook.com" className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors" aria-label="Email">
                   <Mail className="w-6 h-6" />
                 </a>
               </div>
