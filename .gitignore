@@ -74,3 +74,8 @@ storybook-static/
 cypress/videos/
 cypress/screenshots/
 .vercel
+
+
+# Vídeos locais (opcional)
+public/reels/*.mp4
+public/reels/*.mov

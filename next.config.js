@@ -38,6 +38,7 @@ const nextConfig = {
               img-src 'self' data: https:;
               font-src 'self';
               connect-src 'self' https://api.github.com;
+              frame-src https://www.youtube.com https://www.youtube-nocookie.com;
               frame-ancestors 'none';
               base-uri 'self';
               form-action 'self';
