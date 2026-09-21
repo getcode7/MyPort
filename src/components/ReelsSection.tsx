@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { ReelCard, type ReelData } from './ReelCard';
 import { useLanguage } from '@/hooks/useLanguage';
 
@@ -11,20 +11,29 @@ import { useLanguage } from '@/hooks/useLanguage';
 interface ReelsApiResponse {
   reels: ReelData[];
   total: number;
+  hasMore: boolean;
+  page: number;
+}
+
+interface ReelItem extends ReelData {
+  page: number;
 }
 
 // ============================================
 // CONSTANTES
 // ============================================
 
-/** Textos traduzidos da secção */
+const SEEN_REELS_KEY = 'seenReels';
+const MAX_SEEN_IDS = 300;
+
 const SECTION_TEXTS = {
   pt: {
     title: '📹 Aprende em 60 Segundos',
     subtitle: 'Scroll para ver curiosidades educativas',
     loading: 'A carregar vídeos...',
+    loadingMore: 'A carregar mais vídeos...',
     emptyTitle: 'Nenhum vídeo disponível',
-    emptySubtitle: 'Verifica a configuração e tenta novamente.',
+    emptySubtitle: 'Tenta novamente mais tarde.',
     errorTitle: 'Erro ao carregar vídeos',
     errorSubtitle: 'Tenta novamente mais tarde.',
     query: 'curiosidades educativas',
@@ -33,13 +42,41 @@ const SECTION_TEXTS = {
     title: '📹 Learn in 60 Seconds',
     subtitle: 'Scroll to see educational curiosities',
     loading: 'Loading videos...',
+    loadingMore: 'Loading more videos...',
     emptyTitle: 'No videos available',
-    emptySubtitle: 'Check the configuration and try again.',
+    emptySubtitle: 'Please try again later.',
     errorTitle: 'Error loading videos',
     errorSubtitle: 'Please try again later.',
     query: 'educational curiosities',
   },
 } as const;
+
+// ============================================
+// LOCALSTORAGE
+// ============================================
+
+function getSeenIds(): string[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = localStorage.getItem(SEEN_REELS_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+function addSeenIds(ids: string[]): void {
+  if (typeof window === 'undefined' || ids.length === 0) return;
+  try {
+    const current = new Set(getSeenIds());
+    for (const id of ids) current.add(id);
+
+    const updated = Array.from(current).slice(-MAX_SEEN_IDS);
+    localStorage.setItem(SEEN_REELS_KEY, JSON.stringify(updated));
+  } catch {
+    // Ignora falhas
+  }
+}
 
 // ============================================
 // COMPONENTE
@@ -49,57 +86,101 @@ export function ReelsSection() {
   const { language } = useLanguage();
   const texts = SECTION_TEXTS[language] ?? SECTION_TEXTS.pt;
 
-  const [reels, setReels] = useState<ReelData[]>([]);
+  const [reels, setReels] = useState<ReelItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [hasError, setHasError] = useState(false);
-
-  // Estado do som partilhado entre todos os cards
   const [isMuted, setIsMuted] = useState(true);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+
+  const scrollContainerRef = useRef<HTMLDivElement | null>(null);
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const isLoadingMoreRef = useRef(false);
 
   // ============================================
-  // EFEITOS
+  // FETCH
   // ============================================
 
-  useEffect(() => {
-    let isCancelled = false;
+  const fetchPage = useCallback(
+    async (pageToLoad: number, replace: boolean) => {
+      if (isLoadingMoreRef.current) return;
+      isLoadingMoreRef.current = true;
 
-    async function fetchReels() {
-      setIsLoading(true);
+      if (replace) {
+        setIsLoading(true);
+      } else {
+        setIsLoadingMore(true);
+      }
       setHasError(false);
 
       try {
-        const response = await fetch(
-          `/api/reels?q=${encodeURIComponent(texts.query)}`
-        );
+        const seenIds = getSeenIds();
+        const params = new URLSearchParams({
+          q: texts.query,
+          page: String(pageToLoad),
+        });
 
-        if (!response.ok) {
-          throw new Error(`Erro ${response.status}`);
+        if (seenIds.length > 0) {
+          params.set('exclude', seenIds.join(','));
         }
+
+        const response = await fetch(`/api/reels?${params.toString()}`, {
+          cache: 'no-store',
+        });
+
+        if (!response.ok) throw new Error(`Erro ${response.status}`);
 
         const data: ReelsApiResponse = await response.json();
+        const newReels: ReelItem[] = (data.reels ?? []).map((reel) => ({
+          ...reel,
+          page: pageToLoad,
+        }));
 
-        if (!isCancelled) {
-          setReels(Array.isArray(data.reels) ? data.reels : []);
-        }
+        setReels((prev) => (replace ? newReels : [...prev, ...newReels]));
+        setHasMore(Boolean(data.hasMore));
+        setPage(pageToLoad);
       } catch (error) {
         console.error('Erro ao carregar reels:', error);
-        if (!isCancelled) {
-          setHasError(true);
-          setReels([]);
-        }
+        setHasError(true);
+        if (replace) setReels([]);
       } finally {
-        if (!isCancelled) {
-          setIsLoading(false);
-        }
+        setIsLoading(false);
+        setIsLoadingMore(false);
+        isLoadingMoreRef.current = false;
       }
-    }
+    },
+    [texts.query]
+  );
 
-    fetchReels();
+  // Carrega primeira página
+  useEffect(() => {
+    setReels([]);
+    setPage(1);
+    setHasMore(true);
+    fetchPage(1, true);
+  }, [fetchPage]);
 
-    return () => {
-      isCancelled = true;
-    };
-  }, [texts.query]);
+  // ============================================
+  // SCROLL INFINITO (IntersectionObserver no sentinel)
+  // ============================================
+
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel || !hasMore) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !isLoadingMoreRef.current && hasMore) {
+          fetchPage(page + 1, false);
+        }
+      },
+      { root: scrollContainerRef.current, rootMargin: '200px', threshold: 0 }
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [page, hasMore, fetchPage]);
 
   // ============================================
   // HANDLERS
@@ -109,13 +190,16 @@ export function ReelsSection() {
     setIsMuted((prev) => !prev);
   }, []);
 
+  const handleReelVisible = useCallback((id: string) => {
+    addSeenIds([id]);
+  }, []);
+
   // ============================================
   // RENDER
   // ============================================
 
   return (
     <section id="reels" className="relative bg-black">
-      {/* Cabeçalho fixo */}
       <header className="sticky top-0 z-20 bg-gradient-to-b from-black to-transparent py-6 text-center pointer-events-none">
         <h2 className="text-white text-2xl md:text-3xl font-black">
           {texts.title}
@@ -123,75 +207,56 @@ export function ReelsSection() {
         <p className="text-white/60 text-sm mt-1">{texts.subtitle}</p>
       </header>
 
-      {/* Conteúdo */}
-      {isLoading && <LoadingState message={texts.loading} />}
+      {isLoading && (
+        <div className="h-screen flex items-center justify-center text-white">
+          <p className="text-lg">{texts.loading}</p>
+        </div>
+      )}
 
-      {!isLoading && hasError && (
-        <ErrorState
-          title={texts.errorTitle}
-          subtitle={texts.errorSubtitle}
-        />
+      {!isLoading && hasError && reels.length === 0 && (
+        <div className="h-screen flex items-center justify-center text-white text-center px-6">
+          <div>
+            <p className="text-lg mb-2">⚠️ {texts.errorTitle}</p>
+            <p className="text-sm text-white/60">{texts.errorSubtitle}</p>
+          </div>
+        </div>
       )}
 
       {!isLoading && !hasError && reels.length === 0 && (
-        <EmptyState
-          title={texts.emptyTitle}
-          subtitle={texts.emptySubtitle}
-        />
+        <div className="h-screen flex items-center justify-center text-white text-center px-6">
+          <div>
+            <p className="text-lg mb-2">📭 {texts.emptyTitle}</p>
+            <p className="text-sm text-white/60">{texts.emptySubtitle}</p>
+          </div>
+        </div>
       )}
 
-      {!isLoading && !hasError && reels.length > 0 && (
-        <div className="h-screen overflow-y-scroll snap-y snap-mandatory scroll-smooth">
+      {!isLoading && reels.length > 0 && (
+        <div
+          ref={scrollContainerRef}
+          className="h-screen overflow-y-scroll snap-y snap-mandatory scroll-smooth"
+        >
           {reels.map((reel) => (
             <ReelCard
-              key={reel.id}
+              key={`${reel.page}-${reel.id}`}
               reel={reel}
               language={language as 'pt' | 'en'}
               isMuted={isMuted}
               onToggleMute={handleToggleMute}
+              onVisible={handleReelVisible}
             />
           ))}
+
+          {/* Sentinel para scroll infinito */}
+          <div ref={sentinelRef} className="h-4 w-full" />
+
+          {isLoadingMore && (
+            <div className="h-16 flex items-center justify-center text-white/60 text-sm">
+              {texts.loadingMore}
+            </div>
+          )}
         </div>
       )}
     </section>
-  );
-}
-
-// ============================================
-// SUB-COMPONENTES DE ESTADO
-// ============================================
-
-interface StateProps {
-  title: string;
-  subtitle: string;
-}
-
-function LoadingState({ message }: { message: string }) {
-  return (
-    <div className="h-screen flex items-center justify-center text-white">
-      <p className="text-lg">{message}</p>
-    </div>
-  );
-}
-
-function ErrorState({ title, subtitle }: StateProps) {
-  return (
-    <div className="h-screen flex items-center justify-center text-white text-center px-6">
-      <div>
-        <p className="text-lg mb-2">⚠️ {title}</p>
-        <p className="text-sm text-white/60">{subtitle}</p>
-      </div>
-    </div>
-  );
-}
-
-function EmptyState({ title, subtitle }: StateProps) {
-  return (
-    <div className="h-screen flex items-center justify-center text-white text-center px-6">
-      <div>
-        <p className="text-lg mb-2">📭 {title}</p>
-        <p className="text-sm text-white/60">{subtitle}</p>
-      </div>
-    </div>
   );
 }
