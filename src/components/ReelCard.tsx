@@ -1,6 +1,6 @@
 'use client';
 
-import { memo } from 'react';
+import { memo, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Heart, Share2, Volume2, VolumeX } from 'lucide-react';
 import { useIntersectionVideo } from '@/hooks/useIntersectionVideo';
@@ -24,13 +24,13 @@ interface ReelCardProps {
   language: 'pt' | 'en';
   isMuted: boolean;
   onToggleMute: () => void;
+  onVisible?: (id: string) => void;
 }
 
 // ============================================
 // CONSTANTES
 // ============================================
 
-/** Parâmetros do embed do YouTube */
 const YOUTUBE_EMBED_PARAMS = {
   autoplay: '1',
   loop: '1',
@@ -44,9 +44,6 @@ const YOUTUBE_EMBED_PARAMS = {
 // FUNÇÕES AUXILIARES
 // ============================================
 
-/**
- * Constrói o URL do iframe do YouTube com os parâmetros corretos.
- */
 function buildEmbedUrl(
   embedUrl: string,
   videoId: string,
@@ -61,9 +58,6 @@ function buildEmbedUrl(
   return `${embedUrl}?${params.toString()}`;
 }
 
-/**
- * Devolve o estilo do container do vídeo (9:16 responsivo).
- */
 function getVideoContainerStyle(): React.CSSProperties {
   return {
     width: 'min(90vh * 9 / 16, 420px, 90vw)',
@@ -80,11 +74,19 @@ export const ReelCard = memo(function ReelCard({
   reel,
   isMuted,
   onToggleMute,
+  onVisible,
 }: ReelCardProps) {
   const { containerRef, isVisible } = useIntersectionVideo();
 
   const embedSrc = buildEmbedUrl(reel.embedUrl, reel.id, isMuted);
   const iframeKey = `${reel.id}-${isMuted ? 'muted' : 'unmuted'}`;
+
+  // Notificar o parent quando este reel fica visível
+  useEffect(() => {
+    if (isVisible && onVisible) {
+      onVisible(reel.id);
+    }
+  }, [isVisible, reel.id, onVisible]);
 
   return (
     <motion.div
@@ -99,7 +101,6 @@ export const ReelCard = memo(function ReelCard({
         className="relative rounded-2xl overflow-hidden bg-gray-900 shadow-2xl"
         style={getVideoContainerStyle()}
       >
-        {/* Vídeo (iframe) ou thumbnail de pré-visualização */}
         {isVisible ? (
           <iframe
             key={iframeKey}
@@ -121,10 +122,8 @@ export const ReelCard = memo(function ReelCard({
           />
         )}
 
-        {/* Gradiente para legibilidade */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30 pointer-events-none" />
 
-        {/* Botão de som */}
         <button
           type="button"
           onClick={onToggleMute}
@@ -138,7 +137,6 @@ export const ReelCard = memo(function ReelCard({
           )}
         </button>
 
-        {/* Informação do vídeo */}
         <div className="absolute bottom-0 left-0 right-0 p-5 text-white pointer-events-none z-20">
           <h3 className="text-base font-bold mb-1 line-clamp-2">
             {reel.title}
@@ -148,7 +146,6 @@ export const ReelCard = memo(function ReelCard({
           </p>
         </div>
 
-        {/* Ações laterais */}
         <div className="absolute right-3 bottom-20 flex flex-col gap-4 z-20 pointer-events-auto">
           <ActionButton
             icon={<Heart className="w-5 h-5" />}

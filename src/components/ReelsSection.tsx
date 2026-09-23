@@ -26,6 +26,9 @@ interface ReelItem extends ReelData {
 const SEEN_REELS_KEY = 'seenReels';
 const MAX_SEEN_IDS = 300;
 
+/** Percentagem do lote a partir da qual se pré-carrega o próximo */
+const PREFETCH_TRIGGER_RATIO = 0.5;
+
 const SECTION_TEXTS = {
   pt: {
     title: '📹 Aprende em 60 Segundos',
@@ -95,8 +98,14 @@ export function ReelsSection() {
   const [hasMore, setHasMore] = useState(true);
 
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
-  const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const prefetchRef = useRef<HTMLDivElement | null>(null);
   const isLoadingMoreRef = useRef(false);
+  const hasMoreRef = useRef(true);
+
+  // Mantém a ref sincronizada com o estado
+  useEffect(() => {
+    hasMoreRef.current = hasMore;
+  }, [hasMore]);
 
   // ============================================
   // FETCH
@@ -105,6 +114,8 @@ export function ReelsSection() {
   const fetchPage = useCallback(
     async (pageToLoad: number, replace: boolean) => {
       if (isLoadingMoreRef.current) return;
+      if (!replace && !hasMoreRef.current) return;
+
       isLoadingMoreRef.current = true;
 
       if (replace) {
@@ -153,34 +164,45 @@ export function ReelsSection() {
     [texts.query]
   );
 
-  // Carrega primeira página
+  // Primeira página
   useEffect(() => {
     setReels([]);
     setPage(1);
     setHasMore(true);
+    hasMoreRef.current = true;
     fetchPage(1, true);
   }, [fetchPage]);
 
   // ============================================
-  // SCROLL INFINITO (IntersectionObserver no sentinel)
+  // PRÉ-CARREGAMENTO NO MEIO DO LOTE
   // ============================================
 
   useEffect(() => {
-    const sentinel = sentinelRef.current;
-    if (!sentinel || !hasMore) return;
+    const trigger = prefetchRef.current;
+    const container = scrollContainerRef.current;
+    if (!trigger || !container || !hasMore) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && !isLoadingMoreRef.current && hasMore) {
+        if (
+          entries[0].isIntersecting &&
+          !isLoadingMoreRef.current &&
+          hasMoreRef.current
+        ) {
           fetchPage(page + 1, false);
         }
       },
-      { root: scrollContainerRef.current, rootMargin: '200px', threshold: 0 }
+      {
+        root: container,
+        // Dispara quando o trigger está a 300px do fundo do viewport
+        rootMargin: '0px 0px 300px 0px',
+        threshold: 0,
+      }
     );
 
-    observer.observe(sentinel);
+    observer.observe(trigger);
     return () => observer.disconnect();
-  }, [page, hasMore, fetchPage]);
+  }, [page, hasMore, fetchPage, reels.length]);
 
   // ============================================
   // HANDLERS
@@ -193,6 +215,16 @@ export function ReelsSection() {
   const handleReelVisible = useCallback((id: string) => {
     addSeenIds([id]);
   }, []);
+
+  // ============================================
+  // CÁLCULO DO TRIGGER
+  // ============================================
+
+  // Índice onde colocamos o trigger de pré-carregamento (meio do lote)
+  const triggerIndex = Math.max(
+    1,
+    Math.floor(reels.length * PREFETCH_TRIGGER_RATIO) - 1
+  );
 
   // ============================================
   // RENDER
@@ -236,23 +268,32 @@ export function ReelsSection() {
           ref={scrollContainerRef}
           className="h-screen overflow-y-scroll snap-y snap-mandatory scroll-smooth"
         >
-          {reels.map((reel) => (
-            <ReelCard
-              key={`${reel.page}-${reel.id}`}
-              reel={reel}
-              language={language as 'pt' | 'en'}
-              isMuted={isMuted}
-              onToggleMute={handleToggleMute}
-              onVisible={handleReelVisible}
-            />
-          ))}
+          {reels.map((reel, index) => (
+            <div key={`${reel.page}-${reel.id}`}>
+              {/* Trigger invisível no meio do lote */}
+              {index === triggerIndex && hasMore && (
+                <div ref={prefetchRef} className="h-0 w-0" aria-hidden="true" />
+              )}
 
-          {/* Sentinel para scroll infinito */}
-          <div ref={sentinelRef} className="h-4 w-full" />
+              <ReelCard
+                reel={reel}
+                language={language as 'pt' | 'en'}
+                isMuted={isMuted}
+                onToggleMute={handleToggleMute}
+                onVisible={handleReelVisible}
+              />
+            </div>
+          ))}
 
           {isLoadingMore && (
             <div className="h-16 flex items-center justify-center text-white/60 text-sm">
               {texts.loadingMore}
+            </div>
+          )}
+
+          {!hasMore && (
+            <div className="h-16 flex items-center justify-center text-white/40 text-xs">
+              — fim —
             </div>
           )}
         </div>
