@@ -1,7 +1,10 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { ReelCard, type ReelData } from './ReelCard';
+import { useCallback, useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
+import { Play, Film } from 'lucide-react';
+import type { ReelData } from './ReelCard';
+import { ReelsModal } from './ReelsModal';
 import { useLanguage } from '@/hooks/useLanguage';
 
 // ============================================
@@ -15,42 +18,34 @@ interface ReelsApiResponse {
   page: number;
 }
 
-interface ReelItem extends ReelData {
-  page: number;
-}
-
 // ============================================
 // CONSTANTES
 // ============================================
 
 const SEEN_REELS_KEY = 'seenReels';
 const MAX_SEEN_IDS = 300;
-
-/** Percentagem do lote a partir da qual se pré-carrega o próximo */
-const PREFETCH_TRIGGER_RATIO = 0.5;
+const PREVIEW_COUNT = 3;
 
 const SECTION_TEXTS = {
   pt: {
-    title: '📹 Aprende em 60 Segundos',
-    subtitle: 'Scroll para ver curiosidades educativas',
-    loading: 'A carregar vídeos...',
-    loadingMore: 'A carregar mais vídeos...',
-    emptyTitle: 'Nenhum vídeo disponível',
-    emptySubtitle: 'Tenta novamente mais tarde.',
-    errorTitle: 'Erro ao carregar vídeos',
-    errorSubtitle: 'Tenta novamente mais tarde.',
+    impact: '📹 Educativo',
+    title: 'Reels Educativos',
+    description:
+      'Curiosidades educativas em formato rápido. Aprende em 60 segundos com uma experiência de scroll imersiva.',
+    cta: 'Ver Reels',
+    loading: 'A carregar...',
     query: 'curiosidades educativas',
+    tags: ['Vídeo', 'Educação', 'Curiosidades'],
   },
   en: {
-    title: '📹 Learn in 60 Seconds',
-    subtitle: 'Scroll to see educational curiosities',
-    loading: 'Loading videos...',
-    loadingMore: 'Loading more videos...',
-    emptyTitle: 'No videos available',
-    emptySubtitle: 'Please try again later.',
-    errorTitle: 'Error loading videos',
-    errorSubtitle: 'Please try again later.',
+    impact: '📹 Educational',
+    title: 'Educational Reels',
+    description:
+      'Educational curiosities in a quick format. Learn in 60 seconds with an immersive scroll experience.',
+    cta: 'View Reels',
+    loading: 'Loading...',
     query: 'educational curiosities',
+    tags: ['Video', 'Education', 'Curiosities'],
   },
 } as const;
 
@@ -89,48 +84,22 @@ export function ReelsSection() {
   const { language } = useLanguage();
   const texts = SECTION_TEXTS[language] ?? SECTION_TEXTS.pt;
 
-  const [reels, setReels] = useState<ReelItem[]>([]);
+  const [previewReels, setPreviewReels] = useState<ReelData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [hasError, setHasError] = useState(false);
-  const [isMuted, setIsMuted] = useState(true);
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
 
-  const scrollContainerRef = useRef<HTMLDivElement | null>(null);
-  const prefetchRef = useRef<HTMLDivElement | null>(null);
-  const isLoadingMoreRef = useRef(false);
-  const hasMoreRef = useRef(true);
+  // ============================================
+  // FETCH PREVIEW
+  // ============================================
 
-  // Mantém a ref sincronizada com o estado
   useEffect(() => {
-    hasMoreRef.current = hasMore;
-  }, [hasMore]);
+    let cancelled = false;
 
-  // ============================================
-  // FETCH
-  // ============================================
-
-  const fetchPage = useCallback(
-    async (pageToLoad: number, replace: boolean) => {
-      if (isLoadingMoreRef.current) return;
-      if (!replace && !hasMoreRef.current) return;
-
-      isLoadingMoreRef.current = true;
-
-      if (replace) {
-        setIsLoading(true);
-      } else {
-        setIsLoadingMore(true);
-      }
-      setHasError(false);
-
+    async function fetchPreview() {
+      setIsLoading(true);
       try {
         const seenIds = getSeenIds();
-        const params = new URLSearchParams({
-          q: texts.query,
-          page: String(pageToLoad),
-        });
+        const params = new URLSearchParams({ q: texts.query, page: '1' });
 
         if (seenIds.length > 0) {
           params.set('exclude', seenIds.join(','));
@@ -143,161 +112,134 @@ export function ReelsSection() {
         if (!response.ok) throw new Error(`Erro ${response.status}`);
 
         const data: ReelsApiResponse = await response.json();
-        const newReels: ReelItem[] = (data.reels ?? []).map((reel) => ({
-          ...reel,
-          page: pageToLoad,
-        }));
 
-        setReels((prev) => (replace ? newReels : [...prev, ...newReels]));
-        setHasMore(Boolean(data.hasMore));
-        setPage(pageToLoad);
-      } catch (error) {
-        console.error('Erro ao carregar reels:', error);
-        setHasError(true);
-        if (replace) setReels([]);
-      } finally {
-        setIsLoading(false);
-        setIsLoadingMore(false);
-        isLoadingMoreRef.current = false;
-      }
-    },
-    [texts.query]
-  );
-
-  // Primeira página
-  useEffect(() => {
-    setReels([]);
-    setPage(1);
-    setHasMore(true);
-    hasMoreRef.current = true;
-    fetchPage(1, true);
-  }, [fetchPage]);
-
-  // ============================================
-  // PRÉ-CARREGAMENTO NO MEIO DO LOTE
-  // ============================================
-
-  useEffect(() => {
-    const trigger = prefetchRef.current;
-    const container = scrollContainerRef.current;
-    if (!trigger || !container || !hasMore) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (
-          entries[0].isIntersecting &&
-          !isLoadingMoreRef.current &&
-          hasMoreRef.current
-        ) {
-          fetchPage(page + 1, false);
+        if (!cancelled) {
+          setPreviewReels((data.reels ?? []).slice(0, PREVIEW_COUNT));
         }
-      },
-      {
-        root: container,
-        // Dispara quando o trigger está a 300px do fundo do viewport
-        rootMargin: '0px 0px 300px 0px',
-        threshold: 0,
+      } catch (error) {
+        console.error('Erro ao carregar preview de reels:', error);
+        if (!cancelled) setPreviewReels([]);
+      } finally {
+        if (!cancelled) setIsLoading(false);
       }
-    );
+    }
 
-    observer.observe(trigger);
-    return () => observer.disconnect();
-  }, [page, hasMore, fetchPage, reels.length]);
+    fetchPreview();
+    return () => {
+      cancelled = true;
+    };
+  }, [texts.query]);
 
   // ============================================
   // HANDLERS
   // ============================================
 
-  const handleToggleMute = useCallback(() => {
-    setIsMuted((prev) => !prev);
-  }, []);
-
+  const handleOpen = useCallback(() => setIsOpen(true), []);
+  const handleClose = useCallback(() => setIsOpen(false), []);
   const handleReelVisible = useCallback((id: string) => {
     addSeenIds([id]);
   }, []);
 
   // ============================================
-  // CÁLCULO DO TRIGGER
-  // ============================================
-
-  // Índice onde colocamos o trigger de pré-carregamento (meio do lote)
-  const triggerIndex = Math.max(
-    1,
-    Math.floor(reels.length * PREFETCH_TRIGGER_RATIO) - 1
-  );
-
-  // ============================================
-  // RENDER
+  // RENDER — cartão com o mesmo estilo dos projetos
   // ============================================
 
   return (
-    <section id="reels" className="relative bg-black">
-      <header className="sticky top-0 z-20 bg-gradient-to-b from-black to-transparent py-6 text-center pointer-events-none">
-        <h2 className="text-white text-2xl md:text-3xl font-black">
-          {texts.title}
-        </h2>
-        <p className="text-white/60 text-sm mt-1">{texts.subtitle}</p>
-      </header>
-
-      {isLoading && (
-        <div className="h-screen flex items-center justify-center text-white">
-          <p className="text-lg">{texts.loading}</p>
+    <>
+      <motion.article
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.4 }}
+        onClick={handleOpen}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handleOpen();
+          }
+        }}
+        role="button"
+        tabIndex={0}
+        aria-label={texts.title}
+        className="group relative bg-gray-100/50 dark:bg-gray-900/50 backdrop-blur-sm rounded-[3rem] overflow-hidden border border-gray-200/50 dark:border-gray-800/50 hover:shadow-2xl transition-all flex flex-col h-full cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+      >
+        {/* Badge */}
+        <div className="absolute top-4 right-4 z-10">
+          <span className="text-xs font-black px-3 py-1 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg">
+            {texts.impact}
+          </span>
         </div>
-      )}
 
-      {!isLoading && hasError && reels.length === 0 && (
-        <div className="h-screen flex items-center justify-center text-white text-center px-6">
-          <div>
-            <p className="text-lg mb-2">⚠️ {texts.errorTitle}</p>
-            <p className="text-sm text-white/60">{texts.errorSubtitle}</p>
+        <div className="p-8 flex flex-col flex-1">
+          {/* Tags */}
+          <div className="flex gap-2 mb-6 flex-wrap">
+            {texts.tags.map((tag) => (
+              <span
+                key={tag}
+                className="text-[10px] font-black uppercase tracking-widest text-blue-600 dark:text-blue-400 bg-blue-50/50 dark:bg-blue-900/30 px-3 py-1 rounded-full border border-blue-100/50 dark:border-blue-800/50"
+              >
+                {tag}
+              </span>
+            ))}
           </div>
-        </div>
-      )}
 
-      {!isLoading && !hasError && reels.length === 0 && (
-        <div className="h-screen flex items-center justify-center text-white text-center px-6">
-          <div>
-            <p className="text-lg mb-2">📭 {texts.emptyTitle}</p>
-            <p className="text-sm text-white/60">{texts.emptySubtitle}</p>
-          </div>
-        </div>
-      )}
+          {/* Título */}
+          <h3 className="text-2xl font-black mb-3 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-blue-600 group-hover:to-purple-600 transition-all">
+            {texts.title}
+          </h3>
 
-      {!isLoading && reels.length > 0 && (
-        <div
-          ref={scrollContainerRef}
-          className="h-screen overflow-y-scroll snap-y snap-mandatory scroll-smooth"
-        >
-          {reels.map((reel, index) => (
-            <div key={`${reel.page}-${reel.id}`}>
-              {/* Trigger invisível no meio do lote */}
-              {index === triggerIndex && hasMore && (
-                <div ref={prefetchRef} className="h-0 w-0" aria-hidden="true" />
-              )}
+          {/* Descrição */}
+          <p className="text-gray-600 dark:text-gray-400 font-medium mb-6 leading-relaxed text-sm flex-1">
+            {texts.description}
+          </p>
 
-              <ReelCard
-                reel={reel}
-                language={language as 'pt' | 'en'}
-                isMuted={isMuted}
-                onToggleMute={handleToggleMute}
-                onVisible={handleReelVisible}
-              />
-            </div>
-          ))}
+          {/* Miniaturas (3 previews) */}
+          {isLoading && (
+            <p className="text-xs text-gray-500 mb-4">{texts.loading}</p>
+          )}
 
-          {isLoadingMore && (
-            <div className="h-16 flex items-center justify-center text-white/60 text-sm">
-              {texts.loadingMore}
+          {!isLoading && previewReels.length > 0 && (
+            <div className="grid grid-cols-3 gap-2 mb-4">
+              {previewReels.map((reel) => (
+                <div
+                  key={reel.id}
+                  className="relative aspect-[9/16] rounded-lg overflow-hidden bg-gray-900"
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={reel.thumbnail}
+                    alt=""
+                    loading="lazy"
+                    className="absolute inset-0 w-full h-full object-cover opacity-80"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                  <div className="absolute bottom-1 right-1 bg-white/20 backdrop-blur-md rounded-full p-1">
+                    <Play className="w-2.5 h-2.5 text-white fill-white" />
+                  </div>
+                </div>
+              ))}
             </div>
           )}
 
-          {!hasMore && (
-            <div className="h-16 flex items-center justify-center text-white/40 text-xs">
-              — fim —
-            </div>
-          )}
+          {/* Rodapé com CTA */}
+          <div className="flex gap-4 mt-4 pt-4 border-t border-gray-200/50 dark:border-gray-700/50">
+            <span className="flex items-center gap-2 text-xs font-black text-blue-600 dark:text-blue-400 group-hover:gap-3 transition-all">
+              <Film className="w-4 h-4" />
+              {texts.cta}
+              <Play className="w-3 h-3 fill-current" />
+            </span>
+          </div>
         </div>
-      )}
-    </section>
+      </motion.article>
+
+      {/* Modal fullscreen */}
+      <ReelsModal
+        isOpen={isOpen}
+        onClose={handleClose}
+        query={texts.query}
+        language={language as 'pt' | 'en'}
+        onReelVisible={handleReelVisible}
+      />
+    </>
   );
 }

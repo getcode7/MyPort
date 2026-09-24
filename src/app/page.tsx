@@ -293,12 +293,14 @@ export default function Home() {
                   onOpen={() => handleProjectClick(FEATURED_PROJECT_URL)}
                 />
               ))}
+
+              {/* Reels */}
+              <ReelsSection />
             </div>
           </div>
         </section>
 
-        {/* Reels */}
-        <ReelsSection />
+        
 
         {/* Footer */}
         <Footer
