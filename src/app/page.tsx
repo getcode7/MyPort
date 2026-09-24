@@ -90,8 +90,6 @@ const SOFT_SKILLS: SoftSkill[] = [
   { icon: <Code2 className="w-5 h-5" />, nameKey: 'teamwork', descKey: 'teamworkDesc' },
 ];
 
-/** Rota do projeto em destaque */
-const FEATURED_PROJECT_URL = '/projects/gestao-inteligente';
 
 // ============================================
 // COMPONENTE PRINCIPAL
@@ -290,9 +288,9 @@ export default function Home() {
                     code: t.projects.code,
                     demo: t.projects.demo,
                   }}
-                  onOpen={() => handleProjectClick(FEATURED_PROJECT_URL)}
+                  onOpen={() => handleProjectClick(`/projects/${project.slug}`)}
                 />
-              ))}
+                              ))}
 
               {/* Reels */}
               <ReelsSection />
